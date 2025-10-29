@@ -1,0 +1,15 @@
+# ============================================
+# DocuFlow 1.0 - Dependencias Python
+# ============================================
+# Sistema Operativo: Windows 10/11
+# Python: 3.9+
+# ============================================
+
+# GUI Framework - WebView para interface HTML5
+pywebview==5.3.1
+
+# Utilidades adicionales (agregar según necesites)
+# python-docx==1.1.0     # Para manipular documentos Word
+# openpyxl==3.1.2        # Para leer/escribir archivos Excel
+# pandas==2.2.0          # Para manipulación de datos
+# Pillow==10.2.0         # Para procesamiento de imágenes

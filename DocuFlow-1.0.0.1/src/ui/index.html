@@ -8,11 +8,10 @@
 </head>
 <body>
     <div class="main-container">
-        <!-- Panel Izquierdo: Contendrá la tabla de datos de Sheets -->
         <div id="left-panel" class="panel">
             <div class="panel-toolbar">
                 <div class="toolbar-actions">
-                    <button class="icon-button" title="Cargar hoja de datos">
+                    <button class="icon-button" id="load-sheet-button" title="Cargar hoja de datos">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                             <polyline points="14 2 14 8 20 8"></polyline>
@@ -23,29 +22,24 @@
                     </button>
                 </div>
                 <div class="toolbar-tabs" id="left-tabs">
-                    <div class="tab">Datos</div>
-                    <div class="tab">Mapeo</div>
-                    <div class="tab">Filtros</div>
-                </div>
+                    </div>
             </div>
             <div class="panel-content">
-                <!-- El contenido se generará dinámicamente aquí -->
-                <div class="placeholder" style="display: none;">
+                <div class="placeholder">
                     <div class="placeholder-frame">
                         <h2>Panel de Datos</h2>
                         <p>Aquí se visualizarán los datos del archivo de Google Sheets.</p>
                     </div>
                 </div>
-            </div>
+                </div>
         </div>
 
         <div id="resizer" class="resizer"></div>
 
-        <!-- Panel Derecho: Contendrá las plantillas y variables -->
         <div id="right-panel" class="panel">
             <div class="panel-toolbar">
                 <div class="toolbar-actions">
-                    <button class="icon-button" title="Cargar template">
+                    <button class="icon-button" id="load-template-button" title="Cargar template">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                             <polyline points="14 2 14 8 20 8"></polyline>
@@ -55,24 +49,19 @@
                     </button>
                 </div>
                 <div class="toolbar-tabs" id="right-tabs">
-                    <div class="tab">Plantilla 1</div>
-                    <div class="tab">Plantilla 2</div>
-                    <div class="tab">Plantilla 3</div>
-                </div>
+                    </div>
             </div>
             <div class="panel-content">
-                <!-- El contenido se generará dinámicamente aquí -->
-                <div class="placeholder" style="display: none;">
+                <div class="placeholder">
                     <div class="placeholder-frame">
                         <h2>Panel de Plantillas</h2>
                         <p>Aquí se mostrarán las variables encontradas en las plantillas de Word cargadas.</p>
                     </div>
                 </div>
-            </div>
+                </div>
         </div>
     </div>
 
-    <!-- Scripts -->
     <script src="js/bridge.js"></script>
     <script src="js/app.js"></script>
 </body>

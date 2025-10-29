@@ -1,0 +1,42 @@
+D:\progTests\DocuFLow\DocuFlow-1.0.0.0
+│
+├── .gitignore              ← Control de versiones (qué ignorar en Git)
+├── build.spec              ← Configuración PyInstaller para generar .exe
+├── README.md               ← Documentación del proyecto
+├── requirements.txt        ← Dependencias Python del proyecto
+├── setup.py                ← Configuración de instalación/distribución
+│
+├── build/                  ← [AUTO] PyInstaller genera archivos temporales aquí
+├── dist/                   ← [AUTO] Ejecutable final (.exe) se genera aquí
+│
+├── resources/              ← Recursos externos de la aplicación
+│   └── config.json         ← Archivo de configuración (ajustes, rutas, etc.)
+│
+├── src/                    ← CÓDIGO FUENTE PRINCIPAL
+│   ├── __init__.py         ← Hace que 'src' sea un paquete Python
+│   ├── main.py             ← ★ PUNTO DE ENTRADA - Inicia la aplicación
+│   │
+│   ├── core/               ← LÓGICA DE NEGOCIO (Python puro)
+│   │   ├── __init__.py     ← Hace que 'core' sea un paquete
+│   │   ├── document_handler.py  ← Procesar/manipular documentos
+│   │   ├── file_manager.py      ← Gestión de archivos (abrir, guardar, etc.)
+│   │   └── utils.py             ← Funciones auxiliares y utilidades
+│   │
+│   └── ui/                 ← INTERFAZ GRÁFICA (HTML5 + CSS + JS)
+│       ├── index.html      ← ★ Página principal de la GUI
+│       │
+│       ├── css/            ← Estilos visuales
+│       │   └── styles.css  ← Hoja de estilos principal
+│       │
+│       ├── js/             ← JavaScript para interactividad
+│       │   ├── app.js      ← Lógica principal del frontend
+│       │   └── bridge.js   ← ★ Comunicación Python ↔ JavaScript
+│       │
+│       ├── assets/         ← Recursos multimedia
+│       │   └── images/     ← Imágenes, iconos, logos
+│       │
+│       └── pages/          ← Páginas HTML adicionales (opcionales)
+│
+└── tests/                  ← PRUEBAS UNITARIAS
+    ├── __init__.py         ← Hace que 'tests' sea un paquete
+    └── test_core/          ← Tests para módulos de 'core/'

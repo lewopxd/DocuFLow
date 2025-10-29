@@ -1,0 +1,280 @@
+/* ============================================
+   DocuFlow Engine - Estilos Principales
+   ============================================ */
+
+/* --- Variables CSS Globales --- */
+:root {
+    --resizer-width: 8px;
+    --panel-background: rgba(22, 22, 22, 0.5);
+    --border-color: rgba(255, 255, 255, 0.15);
+    --dashed-border-color: rgba(255, 255, 255, 0.3);
+    --hover-color: #007acc;
+    --font-color: #cccccc;
+    --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --tab-bg: rgba(45, 45, 45, 0.6);
+    --tab-height: 22px;
+    --gradient-color-top-left: #00ff99;     /* Verde */
+    --gradient-color-bottom-right: #00c9ff;  /* Azul */
+}
+
+/* --- Reseteo y Estilo Base --- */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    font-family: var(--font-family);
+    color: var(--font-color);
+    background-color: #1e1e1e;
+    
+    /* Fondo SVG de Alta Calidad integrado */
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g1" gradientTransform="rotate(135)"><stop offset="0%" stop-color="%231e1e1e"/><stop offset="50%" stop-color="%232d2d30"/><stop offset="100%" stop-color="%231a2a3a"/></linearGradient><radialGradient id="g2" cx="0" cy="0" r="80%"><stop offset="0%" stop-color="%2300ff99" stop-opacity="0.25"/><stop offset="100%" stop-color="%231e1e1e" stop-opacity="0"/></radialGradient><radialGradient id="g3" cx="100%" cy="100%" r="80%"><stop offset="0%" stop-color="%2300c9ff" stop-opacity="0.25"/><stop offset="100%" stop-color="%231e1e1e" stop-opacity="0"/></radialGradient></defs><rect width="100%" height="100%" fill="url(%23g1)"/><rect width="100%" height="100%" fill="url(%23g2)"/><rect width="100%" height="100%" fill="url(%23g3)"/></svg>');
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+/* --- Contenedor Principal --- */
+.main-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* --- Estilos Comunes de Paneles --- */
+.panel {
+    background-color: var(--panel-background);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-sizing: border-box;
+    overflow: hidden;
+    min-width: 200px;
+    transition: background-color 0.3s ease;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+}
+
+#left-panel { 
+    flex-basis: 50%; 
+    flex-grow: 0; 
+    flex-shrink: 0; 
+}
+
+#right-panel { 
+    flex-grow: 1; 
+}
+
+/* --- Estilos Comunes de Barra de Herramientas --- */
+.panel-toolbar {
+    padding: 10px 20px 0 20px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.toolbar-actions { 
+    margin-bottom: 10px; 
+}
+
+.toolbar-tabs { 
+    display: flex; 
+    justify-content: flex-end; 
+}
+
+/* --- Estilos de Pestañas --- */
+.tab {
+    background-color: var(--tab-bg);
+    border: 1px solid var(--border-color);
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    height: var(--tab-height);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    margin: 0 0.5px;
+    position: relative;
+    bottom: -1px;
+    padding: 0 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    min-width: 5px;
+    max-width: 150px;
+    box-sizing: border-box;
+}
+
+/* --- Etiqueta de Texto (MODIFICADO) --- */
+.tab-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px; /* <-- ESTA ES LA CORRECCIÓN */
+    min-width: 100px;
+    
+}
+
+
+.tab:hover { 
+    background-color: rgba(55, 55, 56, 0.8); 
+}
+
+.tab.active {
+    margin: 0 4px;
+    padding: 0 11px;
+    border-width: 1px;
+    border-style: solid;
+    color: #ffffff;
+}
+
+/* --- Tema Verde: Panel Izquierdo (Datos) --- */
+#left-panel .panel-toolbar { 
+    border-bottom: 1px solid var(--gradient-color-top-left); 
+}
+
+#left-panel .tab {
+    border-bottom-color: var(--gradient-color-top-left);
+}
+
+#left-panel .tab.active {
+    background-color: #00ff9922;
+    border-top-color: var(--gradient-color-top-left);
+    border-left-color: var(--gradient-color-top-left);
+    border-right-color: var(--gradient-color-top-left);
+    border-bottom-color: var(--panel-background);
+}
+
+/* --- Tema Azul: Panel Derecho (Plantillas) --- */
+#right-panel .panel-toolbar { 
+    border-bottom: 1px solid var(--gradient-color-bottom-right); 
+}
+
+#right-panel .tab {
+    border-bottom-color: var(--gradient-color-bottom-right);
+}
+
+#right-panel .tab.active {
+    background-color: #00c9ff22;
+    border-top-color: var(--gradient-color-bottom-right);
+    border-left-color: var(--gradient-color-bottom-right);
+    border-right-color: var(--gradient-color-bottom-right);
+    border-bottom-color: var(--panel-background);
+}
+
+/* --- Iconos y Botones --- */
+.icon-button {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--font-color);
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.icon-button:hover { 
+    background-color: rgba(255, 255, 255, 0.1); 
+    border-color: var(--hover-color); 
+}
+
+.icon-button svg { 
+    width: 18px; 
+    height: 18px; 
+}
+
+/* --- Contenido de Paneles --- */
+.panel-content { 
+    padding: 0;
+    flex-grow: 1; 
+    position: relative;
+}
+
+@keyframes contentFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.tab-content {
+    display: none;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    bottom: 20px;
+    overflow: auto;
+}
+
+.tab-content.active {
+    display: block;
+    animation: contentFadeIn 0.4s ease-out forwards;
+}
+
+/* --- Placeholders --- */
+.placeholder { 
+    color: rgba(255, 255, 255, 0.6); 
+    height: 100%;
+    
+    /* Posicionamiento para que no interfiera con tab-content */
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    bottom: 20px;
+    overflow: auto;
+}
+
+.placeholder-frame { 
+    border: 1px dashed var(--dashed-border-color); 
+    border-radius: 6px; 
+    padding: 20px; 
+    height: 100%; 
+    box-sizing: border-box; 
+}
+
+.placeholder h2 { 
+    margin-top: 0; 
+    color: #fff; 
+    font-weight: 500; 
+    border-bottom: 1px solid var(--border-color); 
+    padding-bottom: 10px; 
+    margin-bottom: 15px; 
+}
+
+/* --- Barra de Arrastre (Resizer) --- */
+.resizer {
+    width: var(--resizer-width);
+    background-color: transparent;
+    cursor: col-resize;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 4px;
+}
+
+.resizer::after {
+    content: '';
+    width: 2px;
+    height: 40px;
+    background-color: var(--border-color);
+    border-radius: 2px;
+    transition: background-color 0.2s ease;
+}
+
+.resizer:hover::after { 
+    background-color: var(--hover-color); 
+}
