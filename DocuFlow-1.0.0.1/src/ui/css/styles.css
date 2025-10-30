@@ -15,6 +15,12 @@
     --tab-height: 22px;
     --gradient-color-top-left: #00ff99;     /* Verde */
     --gradient-color-bottom-right: #00c9ff;  /* Azul */
+
+    --gradient-color-top-left-transparent:#01663e4d; 
+    
+    /* Variable para el fondo "cristal" de metadatos */
+    --meta-bg-crystal: rgba(30, 30, 30, 0.4); 
+    --meta-border-crystal: rgba(255, 255, 255, 0.1);
 }
 
 /* --- Reseteo y Estilo Base --- */
@@ -32,6 +38,7 @@ html, body {
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g1" gradientTransform="rotate(135)"><stop offset="0%" stop-color="%231e1e1e"/><stop offset="50%" stop-color="%232d2d30"/><stop offset="100%" stop-color="%231a2a3a"/></linearGradient><radialGradient id="g2" cx="0" cy="0" r="80%"><stop offset="0%" stop-color="%2300ff99" stop-opacity="0.25"/><stop offset="100%" stop-color="%231e1e1e" stop-opacity="0"/></radialGradient><radialGradient id="g3" cx="100%" cy="100%" r="80%"><stop offset="0%" stop-color="%2300c9ff" stop-opacity="0.25"/><stop offset="100%" stop-color="%231e1e1e" stop-opacity="0"/></radialGradient></defs><rect width="100%" height="100%" fill="url(%23g1)"/><rect width="100%" height="100%" fill="url(%23g2)"/><rect width="100%" height="100%" fill="url(%23g3)"/></svg>');
     background-size: cover;
     background-repeat: no-repeat;
+   
 }
 
 /* --- Contenedor Principal --- */
@@ -41,6 +48,8 @@ html, body {
     height: 100%;
     padding: 20px;
     box-sizing: border-box;
+    
+   
 }
 
 /* --- Estilos Comunes de Paneles --- */
@@ -97,24 +106,106 @@ html, body {
     margin: 0 0.5px;
     position: relative;
     bottom: -1px;
-    padding: 0 8px;
-    display: flex;
+
+    /* Define el comportamiento flex explícitamente */
+    flex-grow: 0;      
+    flex-shrink: 1;    
+    flex-basis: 180px; 
+    
+    display: grid;
+    /* Columnas: [Icono] [Wrapper de Nombre (flexible)] [Cerrar] */
+    grid-template-columns: auto 1fr auto;
+    gap: 4px;
     align-items: center;
-    justify-content: center;
+    padding: 0 4px 0 8px; /* Padding L/R asimétrico por el icono */
+
+    /* Habilita "Container Queries" en este elemento. */
+    container-type: inline-size;
+
     font-size: 13px;
-    min-width: 5px;
-    max-width: 150px;
+    min-width: 50px; /* Ancho mínimo (para 2 iconos) */
+    max-width: 200px; 
     box-sizing: border-box;
 }
 
-/* --- Etiqueta de Texto (MODIFICADO) --- */
+/* --- Elementos del Grid de Pestaña --- */
+.tab-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+}
+
+/* Estilos para los SVGs de tipo de archivo */
+.tab-icon svg {
+    width: 100%;
+    height: 100%;
+    stroke: none; /* Asegurar que no haya borde */
+}
+
+/* Coloreado de iconos por panel */
+#left-panel .tab-icon svg {
+    fill: var(--font-color); /* Usa fill para el color del panel */
+}
+
+#right-panel .tab-icon svg {
+    fill: var(--font-color); /* Usa fill para el color del panel */
+}
+
+/* --- Wrapper para Nombre + Extensión --- */
+.tab-name-wrapper {
+    display: flex; /* Coloca el nombre y la extensión en línea */
+    min-width: 0;  /* Esencial para que flexbox calcule el desbordamiento */
+    overflow: hidden; /* Oculta el desbordamiento general del wrapper */
+}
+
 .tab-label {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 150px; /* <-- ESTA ES LA CORRECCIÓN */
-    min-width: 100px;
-    
+    /* La lógica de encogimiento (ellipsis) se aplica aquí */
+}
+
+.tab-ext {
+    white-space: nowrap;
+    /* Estilo idéntico al label */
+}
+
+.tab-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    padding: 1px;
+    margin-left: 2px;
+}
+.tab-close svg {
+    width: 14px;
+    height: 14px;
+    stroke: var(--font-color);
+    opacity: 0.7;
+    transition: opacity 0.2s ease, background-color 0.2s ease;
+}
+.tab-close:hover svg {
+    opacity: 1;
+}
+.tab-close:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* --- Layout Responsivo de Pestaña (Container Query) --- */
+@container (max-width: 100px) {
+    .tab {
+        /* Cambia el grid a 2 columnas */
+        grid-template-columns: 1fr auto; /* [Name-Wrapper] [Close] */
+        padding: 0 4px; /* Padding L/R simétrico */
+    }
+
+    .tab-icon {
+        /* Oculta el icono */
+        display: none;
+    }
 }
 
 
@@ -124,10 +215,23 @@ html, body {
 
 .tab.active {
     margin: 0 4px;
-    padding: 0 11px;
+    /* Padding ajustado para grid */
+    padding-left: 11px;
+    padding-right: 7px;
     border-width: 1px;
     border-style: solid;
     color: #ffffff;
+}
+/* Padding de la pestaña activa cuando también es compacta */
+@container (max-width: 100px) {
+    .tab.active {
+        padding: 0 7px; /* Padding L/R simétrico */
+    }
+}
+
+/* Al estar activa, el botón de cerrar es más visible */
+.tab.active .tab-close svg {
+    opacity: 0.9;
 }
 
 /* --- Tema Verde: Panel Izquierdo (Datos) --- */
@@ -164,7 +268,7 @@ html, body {
     border-bottom-color: var(--panel-background);
 }
 
-/* --- Iconos y Botones --- */
+/* --- Iconos y Botones (Barra de Acciones) --- */
 .icon-button {
     background-color: transparent;
     border: 1px solid var(--border-color);
@@ -190,11 +294,13 @@ html, body {
     height: 18px; 
 }
 
-/* --- Contenido de Paneles --- */
+/* --- Contenido de Paneles (Scrollbar Corregido) --- */
 .panel-content { 
     padding: 0;
     flex-grow: 1; 
     position: relative;
+    /* Eliminado el overflow para evitar el scrollbar duplicado del padre */
+    overflow: hidden; 
 }
 
 @keyframes contentFadeIn {
@@ -208,41 +314,207 @@ html, body {
     }
 }
 
+/* Estas son las reglas correctas para el "box-inset" */
 .tab-content {
+    width: calc(100% - 40px);
+    height: calc(100% - 40px);
+    margin: 20px;
+    
     display: none;
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    right: 20px;
-    bottom: 20px;
-    overflow: auto;
+    overflow: hidden; 
+    padding: 0; 
 }
 
 .tab-content.active {
     display: block;
     animation: contentFadeIn 0.4s ease-out forwards;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
 }
 
-/* --- Placeholders --- */
-.placeholder { 
-    color: rgba(255, 255, 255, 0.6); 
+/* El wrapper del Grid (HIJO de .tab-content) */
+.tab-content-grid {
+    display: grid; 
+    grid-template-columns: 1fr;
+    /* Filas fijas en porcentaje */
+    grid-template-rows: 10% 70% 20%;
+    
+    /* Ocupa el 100% de su padre (.tab-content) */
+    width: 100%;
     height: 100%;
     
-    /* Posicionamiento para que no interfiera con tab-content */
+    overflow: hidden; /* Contener cualquier desbordamiento interno */
+}
+
+/* Fila 1: Path del archivo */
+.status-bar__path {
+    flex-shrink: 0;
+    padding: 10px 20px; /* Padding compacto */
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--meta-bg-crystal); /* Fondo cristal sutil */
+    
+    overflow: hidden; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.status-bar__path span {
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 13px;
+    color: var(--font-color);
+    opacity: 0.7; /* Más sutil */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block; /* para que funcione text-overflow */
+    font-weight: 300; /* Minimalista */
+}
+
+
+/* Fila 2: Wrapper del árbol */
+.tree-wrapper {
+    position: relative; /* Contenedor para el árbol */
+    overflow: hidden; /* Asegura que el árbol no desborde el grid */
+}
+
+
+
+/* [MODIFICADO] Fila 3: Barra de Metadatos - SIEMPRE 2 FILAS */
+.meta-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px 16px;
+    border-top: 1px solid var(--border-color);
+    background-color: var(--meta-bg-crystal);
+    overflow: hidden;
+}
+
+/* Fila Superior: Format + Size */
+.meta-bar-row-top {
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+/* Fila Inferior: Sheets + Tables + Columns + Total Rows */
+.meta-bar-row-bottom {
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+/* Caja individual de metadato */
+.meta-stat-box {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Contenido centrado */
+    
+    flex: 1; /* Repartirse el ancho disponible */
+    min-width: 0;
+    
+    background-color: var(--meta-bg-crystal);
+    border: 1px solid var(--meta-border-crystal);
+    border-radius: 3px;
+    padding: 3px 6px;
+    
+    font-size: 8pt;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+/* Cajas de la fila SUPERIOR: layout en FILA */
+.meta-stat-box--top {
+    flex-direction: row;
+    gap: 4px;
+}
+
+/* Cajas de la fila INFERIOR: layout en COLUMNA */
+.meta-stat-box--bottom {
+ flex-direction: row;
+ gap: 2px;
+}
+
+/* Label y Valor */
+.meta-stat-label,
+.meta-stat-value {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.meta-stat-label {
+    color: var(--font-color);
+    opacity: 0.7;
+    font-weight: 300;
+}
+
+.meta-stat-value {
+    color: #ffffff;
+    font-weight: 500;
+}
+
+
+
+
+
+
+
+
+
+
+
+/* --- Estilos del Contenedor del Paneton Tree --- */
+.paneton-tree-container {
+    background-color: transparent !important; 
+    border: none;
+    height: 100%;
+    width: 100%;
+    overflow: hidden; 
+    
+    /* Padding ajustado para el grid de 3 filas */
+    padding: 15px 20px 15px 20px;
+    box-sizing: border-box;
+}
+
+ [data-paneton-tree] {   
+    --pntn-tree-color-node-background-hover: #3b3b3b1a;   
+    --pntn-tree-color-node-background-selected: var(--gradient-color-top-left-transparent);
+ }
+
+
+
+ 
+ 
+
+
+/* --- Placeholders --- */
+/* El placeholder ahora es un HERMANO del .tab-content-grid,
+   por lo que su posicionamiento debe ser relativo al .panel-content */
+.placeholder { 
+    color: rgba(255, 255, 255, 0.6); 
+    
+    /* Posicionamiento para que ocupe el área del .tab-content */
     position: absolute;
     top: 20px;
     left: 20px;
     right: 20px;
     bottom: 20px;
-    overflow: auto;
+    overflow: auto; 
 }
 
 .placeholder-frame { 
     border: 1px dashed var(--dashed-border-color); 
     border-radius: 6px; 
     padding: 20px; 
-    height: 100%; 
     box-sizing: border-box; 
+    
+    width: 100%;
+    height: 100%;
 }
 
 .placeholder h2 { 

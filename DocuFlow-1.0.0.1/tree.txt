@@ -1,13 +1,10 @@
-D:\progTests\DocuFLow\DocuFlow-1.0.0.0
+ D:\progTests\DocuFLow\DocuFlow-1.0.0.1
 │
 ├── .gitignore              ← Control de versiones (qué ignorar en Git)
 ├── build.spec              ← Configuración PyInstaller para generar .exe
 ├── README.md               ← Documentación del proyecto
 ├── requirements.txt        ← Dependencias Python del proyecto
 ├── setup.py                ← Configuración de instalación/distribución
-│
-├── build/                  ← [AUTO] PyInstaller genera archivos temporales aquí
-├── dist/                   ← [AUTO] Ejecutable final (.exe) se genera aquí
 │
 ├── resources/              ← Recursos externos de la aplicación
 │   └── config.json         ← Archivo de configuración (ajustes, rutas, etc.)
@@ -20,20 +17,37 @@ D:\progTests\DocuFLow\DocuFlow-1.0.0.0
 │   │   ├── __init__.py     ← Hace que 'core' sea un paquete
 │   │   ├── document_handler.py  ← Procesar/manipular documentos
 │   │   ├── file_manager.py      ← Gestión de archivos (abrir, guardar, etc.)
+│   │   ├── storage.py           ← Funciones para almacenamiento persistente
 │   │   └── utils.py             ← Funciones auxiliares y utilidades
 │   │
 │   └── ui/                 ← INTERFAZ GRÁFICA (HTML5 + CSS + JS)
 │       ├── index.html      ← ★ Página principal de la GUI
 │       │
+│       ├── assets/         ← Recursos multimedia
+│       │   ├── icon.ico
+│       │   └── images/     ← Imágenes, iconos, logos
+│       │       ├── ico-doculfow-transparent.png
+│       │       └── icon-docuflow.png
+│       │
 │       ├── css/            ← Estilos visuales
 │       │   └── styles.css  ← Hoja de estilos principal
 │       │
 │       ├── js/             ← JavaScript para interactividad
-│       │   ├── app.js      ← Lógica principal del frontend
-│       │   └── bridge.js   ← ★ Comunicación Python ↔ JavaScript
-│       │
-│       ├── assets/         ← Recursos multimedia
-│       │   └── images/     ← Imágenes, iconos, logos
+│       │   ├── app.js      ← Lógica principal del frontend (Consumidor)
+│       │   ├── config.js   ← Switch global de entorno (DEMO vs PYTHON)
+│       │   ├── services.js ← Facade/Hub de servicios (API unificada para app.js)
+│       │   │
+│       │   ├── lib/        
+│       │   │   └── paneton.tree.js  ← Framework tree
+│       │   │   
+│       │   └── providers/  ← Implementaciones (Strategies)
+│       │       ├── demo/
+│       │       │   ├── demo-data.json     ← Datos mock para el modo DEMO
+│       │       │   └── provider.demo.js   ← Provider que consume demo-data.json
+│       │       │
+│       │       └── python/
+│       │           ├── provider.python.js ← Provider que consume python-bridge.js
+│       │           └── python-bridge.js   ← ★ Implementación real del bridge Py<->JS
 │       │
 │       └── pages/          ← Páginas HTML adicionales (opcionales)
 │

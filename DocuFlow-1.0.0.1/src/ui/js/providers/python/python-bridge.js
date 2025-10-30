@@ -1,3 +1,16 @@
+// js/python-bridge.js
+/**
+ * Project: DocuFlow
+ * File:  python-bridge.js
+ * Created: 2025-10-29 (Renamed from bridge.js)
+ * Author: @lewopxd 
+ *
+ * Description:
+ * Low-level communication bridge to the pywebview backend.
+ * Manages message queues, retries, and handshake.
+ * This script runs globally and creates 'window.bridgePy'.
+ */
+
 class BridgePy {
     constructor() {
         this.messageQueue = [];
@@ -11,10 +24,10 @@ class BridgePy {
     }
     
     async init() {
-        // Esperar a que pywebview esté disponible
+        // Wait for pywebview to be available
         await this.waitForPywebview();
         
-        // Realizar handshake
+        // Perform handshake
         await this.performHandshake();
     }
     
@@ -45,7 +58,7 @@ class BridgePy {
                 console.log('✅ Handshake completado - Python listo');
                 console.log('📡 Bridge activo y escuchando');
                 
-                // Procesar cola pendiente
+                // Process pending queue
                 this.processQueue();
             } else {
                 console.error('❌ Handshake falló');
@@ -99,20 +112,20 @@ class BridgePy {
                         this.pendingMessages.delete(messageInfo.message.id);
                         this.messageQueue.shift();
                     } else {
-                        // Error - reintentar
+                        // Error - retry
                         messageInfo.retries++;
                         
                         if (messageInfo.retries >= messageInfo.maxRetries) {
-                            messageInfo.reject(new Error(response.content.error || 'Error desconocido'));
+                            messageInfo.reject(new Error(response.content.error || 'Unknown error'));
                             this.pendingMessages.delete(messageInfo.message.id);
                             this.messageQueue.shift();
                         } else {
-                            console.warn(`⚠️ Reintentando mensaje (${messageInfo.retries}/${messageInfo.maxRetries})`);
+                            console.warn(`⚠️ Retrying message (${messageInfo.retries}/${messageInfo.maxRetries})`);
                             await this.delay(this.retryDelay);
                         }
                     }
                 } else {
-                    console.warn('⚠️ ID de respuesta no coincide');
+                    console.warn('⚠️ Response ID mismatch');
                     await this.delay(this.retryDelay);
                 }
             } catch (error) {
@@ -123,7 +136,7 @@ class BridgePy {
                     this.pendingMessages.delete(messageInfo.message.id);
                     this.messageQueue.shift();
                 } else {
-                    console.warn(`⚠️ Reintentando por error (${messageInfo.retries}/${messageInfo.maxRetries})`);
+                    console.warn(`⚠️ Retrying on error (${messageInfo.retries}/${messageInfo.maxRetries})`);
                     await this.delay(this.retryDelay);
                 }
             }
@@ -141,20 +154,20 @@ class BridgePy {
     }
     
     receiveFromPython(message) {
-        console.log('📨 Mensaje desde Python:', message);
-        // Aquí puedes emitir eventos o llamar callbacks
+        console.log('📨 Message from Python:', message);
+        // Emit events or call callbacks here
         window.dispatchEvent(new CustomEvent('python-message', { detail: message }));
     }
     
     clearQueue() {
         this.messageQueue = [];
         this.pendingMessages.forEach(info => {
-            info.reject(new Error('Cola limpiada'));
+            info.reject(new Error('Queue cleared'));
         });
         this.pendingMessages.clear();
-        console.log('🧹 Cola de mensajes limpiada');
+        console.log('🧹 Message queue cleared');
     }
 }
 
-// Crear instancia global
+// Create global instance
 window.bridgePy = new BridgePy();
