@@ -1,0 +1,13 @@
+
+**SIEMPRE ELIMINAR EL VENV ACTUAL Y CREAR UNO NUEVO AL CREAR UNA NUEVA VERSION
+
+deactivate <------------------ detener venv
+
+python -m venv venv      <-------- crear venv
+
+.\venv\Scripts\Activate.ps1    <---- activar venv
+
+python src\main.py           <----- iniciar app
+
+
+pip install -r requirements.txt    <------ install and update dependencies

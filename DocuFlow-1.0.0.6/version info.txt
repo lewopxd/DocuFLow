@@ -1,0 +1,5 @@
+V. 1.0.0.5
+
+Por fin tenemos un test funcional para insertar imagenes sin
+corromper el archivo: la causa , el archivo de plantilla ya venia malformado
+y la libreria lo corrompia. solucion crear un insertador de imagenes propio.

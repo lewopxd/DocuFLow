@@ -1,8 +1,17 @@
-/* ============================================
-   DocuFlow Engine - Estilos Principales
-   ============================================ */
+/*
+ * Project: DocuFlow
+ * File:  styles.css
+ * Created: 2025-10-30
+ * Author: @lewopxd
+ *
+ * Description:
+ * Hoja de estilos principal para DocuFlow Engine.
+ * Define el layout, la apariencia de los paneles y los componentes de UI.
+ */
 
-/* --- Variables CSS Globales --- */
+/*=============================================
+=            Variables CSS Globales           =
+=============================================*/
 :root {
     --resizer-width: 8px;
     --panel-background: rgba(22, 22, 22, 0.5);
@@ -22,8 +31,11 @@
     --meta-bg-crystal: rgba(30, 30, 30, 0.4); 
     --meta-border-crystal: rgba(255, 255, 255, 0.1);
 }
+/*=====  End of Variables CSS Globales  ======*/
 
-/* --- Reseteo y Estilo Base --- */
+/*=============================================
+=            Reseteo y Estilo Base            =
+=============================================*/
 html, body {
     margin: 0;
     padding: 0;
@@ -40,16 +52,17 @@ html, body {
     background-repeat: no-repeat;
    
 }
+/*=====  End of Reseteo y Estilo Base  ======*/
 
-/* --- Contenedor Principal --- */
+/*=============================================
+=            Layout Principal                 =
+=============================================*/
 .main-container {
     display: flex;
     width: 100%;
     height: 100%;
     padding: 20px;
     box-sizing: border-box;
-    
-   
 }
 
 /* --- Estilos Comunes de Paneles --- */
@@ -76,8 +89,11 @@ html, body {
 #right-panel { 
     flex-grow: 1; 
 }
+/*=====  End of Layout Principal  ======*/
 
-/* --- Estilos Comunes de Barra de Herramientas --- */
+/*=============================================
+=            Barra de Herramientas (Paneles)  =
+=============================================*/
 .panel-toolbar {
     padding: 10px 20px 0 20px;
     flex-shrink: 0;
@@ -93,8 +109,11 @@ html, body {
     display: flex; 
     justify-content: flex-end; 
 }
+/*=====  End of Barra de Herramientas (Paneles)  ======*/
 
-/* --- Estilos de Pestañas --- */
+/*=============================================
+=            Componente: Pestañas (Tabs)      =
+=============================================*/
 .tab {
     background-color: var(--tab-bg);
     border: 1px solid var(--border-color);
@@ -233,7 +252,11 @@ html, body {
 .tab.active .tab-close svg {
     opacity: 0.9;
 }
+/*=====  End of Componente: Pestañas (Tabs)  ======*/
 
+/*=============================================
+=            Temas de Panel (Verde/Azul)      =
+=============================================*/
 /* --- Tema Verde: Panel Izquierdo (Datos) --- */
 #left-panel .panel-toolbar { 
     border-bottom: 1px solid var(--gradient-color-top-left); 
@@ -267,8 +290,11 @@ html, body {
     border-right-color: var(--gradient-color-bottom-right);
     border-bottom-color: var(--panel-background);
 }
+/*=====  End of Temas de Panel (Verde/Azul)  ======*/
 
-/* --- Iconos y Botones (Barra de Acciones) --- */
+/*=============================================
+=            Componente: Botones (Icono)      =
+=============================================*/
 .icon-button {
     background-color: transparent;
     border: 1px solid var(--border-color);
@@ -293,13 +319,15 @@ html, body {
     width: 18px; 
     height: 18px; 
 }
+/*=====  End of Componente: Botones (Icono)  ======*/
 
-/* --- Contenido de Paneles (Scrollbar Corregido) --- */
+/*=============================================
+=            Contenido de Paneles (Tabs)      =
+=============================================*/
 .panel-content { 
     padding: 0;
     flex-grow: 1; 
     position: relative;
-    /* Eliminado el overflow para evitar el scrollbar duplicado del padre */
     overflow: hidden; 
 }
 
@@ -331,15 +359,16 @@ html, body {
     border: 1px solid var(--border-color);
     border-radius: 6px;
 }
+/*=====  End of Contenido de Paneles (Tabs)  ======*/
 
-/* El wrapper del Grid (HIJO de .tab-content) */
+/*=============================================
+=            Layout Panel Izquierdo (Flex)    =
+=============================================*/
+/* El wrapper del layout (HIJO de .tab-content) */
 .tab-content-grid {
-    display: grid; 
-    grid-template-columns: 1fr;
-    /* Filas fijas en porcentaje */
-    grid-template-rows: 10% 70% 20%;
+    display: flex; /* [MODIFICADO] */
+    flex-direction: column; /* [NUEVO] */
     
-    /* Ocupa el 100% de su padre (.tab-content) */
     width: 100%;
     height: 100%;
     
@@ -348,7 +377,7 @@ html, body {
 
 /* Fila 1: Path del archivo */
 .status-bar__path {
-    flex-shrink: 0;
+    flex-shrink: 0; /* [NUEVO] No permitir que se encoja */
     padding: 10px 20px; /* Padding compacto */
     border-bottom: 1px solid var(--border-color);
     background-color: var(--meta-bg-crystal); /* Fondo cristal sutil */
@@ -362,12 +391,12 @@ html, body {
     font-family: 'Consolas', 'Monaco', monospace;
     font-size: 13px;
     color: var(--font-color);
-    opacity: 0.7; /* Más sutil */
+    opacity: 0.9; /* [MODIFICADO] Aumentada opacidad de 0.7 a 0.9 */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     display: block; /* para que funcione text-overflow */
-    font-weight: 300; /* Minimalista */
+    font-weight: 400; /* [MODIFICADO] Aumentado peso de 300 a 400 */
 }
 
 
@@ -375,12 +404,14 @@ html, body {
 .tree-wrapper {
     position: relative; /* Contenedor para el árbol */
     overflow: hidden; /* Asegura que el árbol no desborde el grid */
+    flex-grow: 1; /* [NUEVO] El árbol ocupa todo el espacio restante */
+    min-height: 0; /* [NUEVO] Crítico para prevenir desbordamiento en flex */
 }
 
 
-
-/* [MODIFICADO] Fila 3: Barra de Metadatos - SIEMPRE 2 FILAS */
+/* Fila 3: Barra de Metadatos */
 .meta-bar {
+    flex-shrink: 0; /* [NUEVO] No permitir que se encoja */
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -390,21 +421,14 @@ html, body {
     overflow: hidden;
 }
 
-/* Fila Superior: Format + Size */
-.meta-bar-row-top {
+/* [MODIFICADO] Fila Única de Metadatos */
+.meta-bar-row {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap; /* [NUEVO] Permite que los items salten a la siguiente línea */
     gap: 6px;
-    justify-content: flex-start;
-    align-items: center;
-}
+    justify-content: center;
 
-/* Fila Inferior: Sheets + Tables + Columns + Total Rows */
-.meta-bar-row-bottom {
-    display: flex;
-    flex-direction: row;
-    gap: 6px;
-    justify-content: flex-start;
     align-items: center;
 }
 
@@ -414,8 +438,19 @@ html, body {
     align-items: center;
     justify-content: center; /* Contenido centrado */
     
-    flex: 1; /* Repartirse el ancho disponible */
-    min-width: 0;
+    /* [MODIFICADO] 
+     * flex-grow: 1 (Crece para llenar el espacio)
+     * flex-shrink: 1 (Encógete si es necesario)
+     * flex-basis: 0 (Tu tamaño base es 0, no 100px)
+     */
+    flex: 1 1 0; 
+
+    /* [NUEVO]
+     * Define el punto de quiebre. No te encojas a menos de 100px.
+     * Si no cabes, el 'flex-wrap' del padre te moverá.
+     */
+    min-width: fit-content;
+    max-width: 70px; 
     
     background-color: var(--meta-bg-crystal);
     border: 1px solid var(--meta-border-crystal);
@@ -430,7 +465,7 @@ html, body {
 /* Cajas de la fila SUPERIOR: layout en FILA */
 .meta-stat-box--top {
     flex-direction: row;
-    gap: 4px;
+     
 }
 
 /* Cajas de la fila INFERIOR: layout en COLUMNA */
@@ -455,20 +490,13 @@ html, body {
 
 .meta-stat-value {
     color: #ffffff;
-    font-weight: 500;
+    font-weight: 400; /* [MODIFICADO] Reducido de 500 a 400 */
 }
+/*=====  End of Layout Panel Izquierdo (Flex)  ======*/
 
-
-
-
-
-
-
-
-
-
-
-/* --- Estilos del Contenedor del Paneton Tree --- */
+/*=============================================
+=            Componente: Paneton Tree         =
+=============================================*/
 .paneton-tree-container {
     background-color: transparent !important; 
     border: none;
@@ -476,7 +504,7 @@ html, body {
     width: 100%;
     overflow: hidden; 
     
-    /* Padding ajustado para el grid de 3 filas */
+    /* Padding ajustado para el layout */
     padding: 15px 20px 15px 20px;
     box-sizing: border-box;
 }
@@ -485,16 +513,11 @@ html, body {
     --pntn-tree-color-node-background-hover: #3b3b3b1a;   
     --pntn-tree-color-node-background-selected: var(--gradient-color-top-left-transparent);
  }
+/*=====  End of Componente: Paneton Tree  ======*/
 
-
-
- 
- 
-
-
-/* --- Placeholders --- */
-/* El placeholder ahora es un HERMANO del .tab-content-grid,
-   por lo que su posicionamiento debe ser relativo al .panel-content */
+/*=============================================
+=            Placeholders (Paneles Vacíos)    =
+=============================================*/
 .placeholder { 
     color: rgba(255, 255, 255, 0.6); 
     
@@ -525,8 +548,11 @@ html, body {
     padding-bottom: 10px; 
     margin-bottom: 15px; 
 }
+/*=====  End of Placeholders (Paneles Vacíos)  ======*/
 
-/* --- Barra de Arrastre (Resizer) --- */
+/*=============================================
+=            Componente: Resizer              =
+=============================================*/
 .resizer {
     width: var(--resizer-width);
     background-color: transparent;
@@ -550,3 +576,4 @@ html, body {
 .resizer:hover::after { 
     background-color: var(--hover-color); 
 }
+/*=====  End of Componente: Resizer  ======*/

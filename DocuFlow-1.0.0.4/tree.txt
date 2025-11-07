@@ -1,0 +1,94 @@
+DOCUFLOW
+│
+├── .gitignore
+├── build.spec
+├── commands
+├── comments_rules.md       ← ✅ Reglas de estilo de comentarios
+├── README.md
+├── requirements.txt
+├── setup.py
+├── tree.txt                ← (Este archivo)
+├── version info.txt
+│
+├── build/                  ← [NUEVO] Carpeta de compilación
+├── dist/                   ← [NUEVO] Carpeta de distribución
+│
+├── resources/     
+│   └── config.json         ← Archivo de configuración (ajustes, rutas, etc.)
+│
+├── src/                    ← CÓDIGO FUENTE PRINCIPAL
+│   ├── __init__.py
+│   ├── main.py             ← ★ PUNTO DE ENTRADA - Inicia la aplicación (multiproceso, pywebview)
+│   │
+│   ├── core/               ← LÓGICA DE NEGOCIO (Python puro)
+│   │   ├── __init__.py
+│   │   │
+│   │   ├── data_sheet/     ← Lógica para la gestión de hojas de datos
+│   │   │   ├── data-JSON.info         ← [DETALLE] Información de datos
+│   │   │   ├── data_sheet_parser.py   ← [DETALLE] Parseador de hojas
+│   │   │   └── __init__.py
+│   │   │
+│   │   ├── file_helpers/   
+│   │   │   ├── path_utils.py          ← [DETALLE] Utilidades de rutas
+│   │   │   ├── storage.py             ← ✅ Sistema de persistencia (configuración de la app)
+│   │   │   └── __init__.py
+│   │   │
+│   │   ├── ms_word/        ← Lógica para la integración con MS Word (deducido)
+│   │   │   └── __init__.py
+│   │   │
+│   │   ├── orchester/
+│   │   │   ├── main_orchester.py      ← Orquestador principal de flujos de trabajo (deducido)
+│   │   │   └── __init__.py
+│   │   │
+│   │   └── __pycache__/     
+│   │       ├── storage.cpython-313.pyc
+│   │       └── __init__.cpython-313.pyc
+│   │
+│   └── ui/                 ← INTERFAZ GRÁFICA (HTML5 + CSS + JS)
+│       ├── index.html      ← ✅ Página principal de la GUI
+│       │
+│       ├── assets/
+│       │   ├── icon.ico
+│       │   └── images/
+│       │       ├── ico-doculfow-transparent.png
+│       │       └── icon-docuflow.png
+│       │
+│       ├── css/
+│       │   └── main.css    ← ✅ Hoja de estilos principal (Sustituye a styles.css)
+│       │
+│       ├── js/             ← JavaScript para interactividad
+│       │   ├── config.js   
+│       │   ├── icons.js    
+│       │   ├── main.js     ← ✅ Lógica principal del frontend (Consumidor de services.js, antes app.js)
+│       │   ├── services.js ← ✅ Facade/Hub de servicios (API unificada)
+│       │   ├── uiHelpers.js ← ✅ Ayudantes de UI (DOM) sin lógica de negocio 
+│       │   │
+│       │   ├── lib/        
+│       │   │   ├── paneton.tree.js ← Librería Paneton.Tree
+│       │   │   └── pntn.tree.js    ← (Alias o copia de la anterior)
+│       │   │   
+│       │   └── providers/  ← Implementaciones (Strategies)
+│       │       ├── demo/
+│       │       │   ├── demo-data.json     ← Datos mock para el modo DEMO
+│       │       │   └── provider.demo.js   ← Provider que consume demo-data.json
+│       │       │
+│       │       └── python/
+│       │           ├── provider.python.js ← Provider que consume python-bridge.js
+│       │           └── python-bridge.js   ← ★ Implementación real del bridge Py<->JS
+│       │
+│       └── modules/        ← Componentes modulares de la UI
+│           ├── data-panel/
+│           │   ├── data-panel.css
+│           │   ├── data-panel.html
+│           │   └── data-panel.js
+│           │   
+│           └── templates-panel/
+│               ├── templates-panel.css    ← [DETALLE]
+│               ├── templates-panel.html   ← [DETALLE]
+│               └── templates-panel.js     ← [DETALLE]
+│
+├── tests/
+│   ├── __init__.py
+│   └── test_core/
+│
+└── venv/                   ← [NUEVO] Entorno virtual de Python

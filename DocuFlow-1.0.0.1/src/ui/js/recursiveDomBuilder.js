@@ -242,7 +242,8 @@ export function addTab(panelId, tabName, data = {}, fileIconSvg = '', fileStruct
         // Fila 1: Path Bar
         const pathBar = document.createElement('div');
         pathBar.className = 'status-bar__path'; 
-        pathBar.innerHTML = `<span>${directoryPath}</span>`;
+        // [MODIFICADO] Añadido fileName al span
+        pathBar.innerHTML = `<span>${directoryPath}${fileName}</span>`;
         
         // Fila 2: Tree Wrapper
         const treeWrapper = document.createElement('div');
@@ -250,27 +251,23 @@ export function addTab(panelId, tabName, data = {}, fileIconSvg = '', fileStruct
         const treeWrapperId = `tree-wrapper-${Date.now()}`;
         treeWrapper.id = treeWrapperId;
         
-        // Fila 3: Meta Bar con 2 filas
+        // Fila 3: Meta Bar con 1 fila
         const metaBar = document.createElement('div');
         metaBar.className = 'meta-bar'; 
 
-        // Crear Fila Superior (Format + Size)
-        const metaBarRowTop = document.createElement('div');
-        metaBarRowTop.className = 'meta-bar-row-top';
-        metaBarRowTop.appendChild(_createMetaBox('Format', stats.format, 'top'));
-        metaBarRowTop.appendChild(_createMetaBox('Size', stats.size, 'top'));
+        // [MODIFICADO] Crear Fila Única (eliminado metaBarRowTop)
+        const metaBarRow = document.createElement('div');
+        metaBarRow.className = 'meta-bar-row'; // Nueva clase para la fila única
 
-        // Crear Fila Inferior (Resto de metadatos)
-        const metaBarRowBottom = document.createElement('div');
-        metaBarRowBottom.className = 'meta-bar-row-bottom';
-        metaBarRowBottom.appendChild(_createMetaBox('Sheets', stats.sheetCount, 'bottom'));
-        metaBarRowBottom.appendChild(_createMetaBox('Tables', stats.tableCount, 'bottom'));
-        metaBarRowBottom.appendChild(_createMetaBox('Columns', stats.columnCount, 'bottom'));
-        metaBarRowBottom.appendChild(_createMetaBox('Total Rows', stats.totalRows, 'bottom'));
+        // [MODIFICADO] Añadimos 'Size' y eliminamos 'Format'. Usamos 'bottom' para el estilo de caja.
+        metaBarRow.appendChild(_createMetaBox('Size', stats.size, 'bottom'));
+        metaBarRow.appendChild(_createMetaBox('Sheets', stats.sheetCount, 'bottom'));
+        metaBarRow.appendChild(_createMetaBox('Tables', stats.tableCount, 'bottom'));
+        metaBarRow.appendChild(_createMetaBox('Columns', stats.columnCount, 'bottom'));
+        metaBarRow.appendChild(_createMetaBox('Total Rows', stats.totalRows, 'bottom'));
 
-        // Añadir ambas filas al metaBar
-        metaBar.appendChild(metaBarRowTop);
-        metaBar.appendChild(metaBarRowBottom);
+        // Añadir la fila única al metaBar
+        metaBar.appendChild(metaBarRow);
         
         // [MODIFICADO] Añadir filas al gridWrapper, NO al newContentPane
         gridWrapper.appendChild(pathBar);

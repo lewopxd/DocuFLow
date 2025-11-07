@@ -1,0 +1,25 @@
+
+
+
+Aun sigue siendo una version de prueba pero ya mas estable
+logramos crear un core estable capaz de generar cientos de words
+a partir de plantillas y datos de excel
+
+ademas con la posibilidad de que a plantilla sea un pdf. lo cual es perfecto
+
+creamos un orquestador que funciona casi como una api que puede ser 
+muy flexible  a traves de un diccionario de configuracion 
+perfecto para a futuro enviar las ordenes desde la UI.
+
+hasta el momento no hay insercin de imagenes ni manejo de adjuntos
+pero funciona muy bien.
+
+el siguiente paso: insercion de imagenes (pendiente analizar como crear un auditor)
+
+de manera que almacene a partir del bulk creado que es o que debe auditar 
+y se pueda llamar al final ademas con la lectura de logs para 
+analizar y garantizar y mostrar que el proceso haya sido de manera exitosa.
+
+hace falta un sistema de comunicaciones, tenemos logs, pero podriamos crear
+un sistema que transmita el proceso ej paso 1/10 para que en algun canal
+de comunicaciones AISLADO la ui pueda saber que esta haciendo py.

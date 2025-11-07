@@ -1,0 +1,635 @@
+/*
+ * Project: DocuFlow
+ * File:  styles.css
+ * Created: 2025-10-30
+ * Author: @lewopxd
+ *
+ * Description:
+ * Main stylesheet for the DocuFlow Engine.
+ * Defines the layout, panel appearance, and UI components.
+ */
+
+/*=============================================
+=            Global CSS Variables             =
+=============================================*/
+:root {
+    --resizer-width: 8px;
+    --panel-background: rgba(22, 22, 22, 0.5);
+    --border-color: rgba(255, 255, 255, 0.15);
+    --dashed-border-color: rgba(255, 255, 255, 0.3);
+    --hover-color: #007acc;
+    --font-color: #cccccc;
+    --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --tab-bg: rgba(45, 45, 45, 0.6);
+    --tab-height: 22px;
+    --gradient-color-top-left: #00ff99;     /* Green */
+    --gradient-color-bottom-right: #00c9ff;  /* Blue */
+
+    --gradient-color-top-left-transparent:#01663e4d; 
+    
+    /* Variable for the "crystal" metadata background */
+    --meta-bg-crystal: rgba(30, 30, 30, 0.4); 
+    --meta-border-crystal: rgba(255, 255, 255, 0.1);
+}
+/*=====  End of Global CSS Variables  ======*/
+
+/*=============================================
+=            Reset and Base Style             =
+=============================================*/
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    font-family: var(--font-family);
+    color: var(--font-color);
+    background-color: #1e1e1e;
+    
+    /* High-Quality embedded SVG Background */
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g1" gradientTransform="rotate(135)"><stop offset="0%" stop-color="%231e1e1e"/><stop offset="50%" stop-color="%232d2d30"/><stop offset="100%" stop-color="%231a2a3a"/></linearGradient><radialGradient id="g2" cx="0" cy="0" r="80%"><stop offset="0%" stop-color="%2300ff99" stop-opacity="0.25"/><stop offset="100%" stop-color="%231e1e1e" stop-opacity="0"/></radialGradient><radialGradient id="g3" cx="100%" cy="100%" r="80%"><stop offset="0%" stop-color="%2300c9ff" stop-opacity="0.25"/><stop offset="100%" stop-color="%231e1e1e" stop-opacity="0"/></radialGradient></defs><rect width="100%" height="100%" fill="url(%23g1)"/><rect width="100%" height="100%" fill="url(%23g2)"/><rect width="100%" height="100%" fill="url(%23g3)"/></svg>');
+    background-size: cover;
+    background-repeat: no-repeat;
+   
+}
+/*=====  End of Reset and Base Style  ======*/
+
+/*=============================================
+=            Main Layout                      =
+=============================================*/
+.main-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* --- Common Panel Styles --- */
+.panel {
+    background-color: var(--panel-background);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-sizing: border-box;
+    overflow: hidden;
+    min-width: 200px;
+    transition: background-color 0.3s ease;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+}
+
+#left-panel { 
+    flex-basis: 50%; 
+    flex-grow: 0; 
+    flex-shrink: 0; 
+}
+
+#right-panel { 
+    flex-grow: 1; 
+}
+/*=====  End of Main Layout  ======*/
+
+/*=============================================
+=            Panel Toolbar                    =
+=============================================*/
+.panel-toolbar {
+    padding: 10px 20px 0 20px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* * .toolbar-actions rule removed as element is no longer in index.html
+ */
+
+.toolbar-tabs { 
+    display: flex; 
+    /* MODIFIED: Tabs start from the left, not the right */
+    justify-content: flex-start; 
+}
+/*=====  End of Panel Toolbar  ======*/
+
+/*=============================================
+=            Component: Tabs                  =
+=============================================*/
+.tab {
+    background-color: var(--tab-bg);
+    border: 1px solid var(--border-color);
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    height: var(--tab-height);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    margin: 0 0.5px;
+    position: relative;
+    bottom: -1px;
+
+    /* Define flex behavior explicitly */
+    flex-grow: 0;      
+    flex-shrink: 1;    
+    flex-basis: 180px; 
+    
+    display: grid;
+    /* Columns: [Icon] [Name Wrapper (flexible)] [Close] */
+    grid-template-columns: auto 1fr auto;
+    gap: 4px;
+    align-items: center;
+    padding: 0 4px 0 8px; /* Asymmetrical L/R padding for icon */
+
+    /* Enable Container Queries on this element. */
+    container-type: inline-size;
+
+    font-size: 13px;
+    min-width: 50px; /* Minimum width (for 2 icons) */
+    max-width: 200px; 
+    box-sizing: border-box;
+}
+
+/* --- Tab Grid Elements --- */
+.tab-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+}
+
+/* Styles for file type SVGs */
+.tab-icon svg {
+    width: 100%;
+    height: 100%;
+    stroke: none; /* Ensure no border */
+}
+
+/* Icon coloring by panel */
+#left-panel .tab-icon svg {
+    fill: var(--font-color); /* Use fill for panel color */
+}
+
+#right-panel .tab-icon svg {
+    fill: var(--font-color); /* Use fill for panel color */
+}
+
+/* --- Wrapper for Name + Extension --- */
+.tab-name-wrapper {
+    display: flex; /* Place name and extension inline */
+    min-width: 0;  /* Essential for flexbox to calculate overflow */
+    overflow: hidden; /* Hide general overflow of the wrapper */
+}
+
+.tab-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* Shrink logic (ellipsis) is applied here */
+}
+
+.tab-ext {
+    white-space: nowrap;
+    /* Identical style to the label */
+}
+
+.tab-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    padding: 1px;
+    margin-left: 2px;
+}
+.tab-close svg {
+    width: 14px;
+    height: 14px;
+    stroke: var(--font-color);
+    opacity: 0.7;
+    transition: opacity 0.2s ease, background-color 0.2s ease;
+}
+.tab-close:hover svg {
+    opacity: 1;
+}
+.tab-close:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* --- Responsive Tab Layout (Container Query) --- */
+@container (max-width: 100px) {
+    .tab {
+        /* Change grid to 2 columns */
+        grid-template-columns: 1fr auto; /* [Name-Wrapper] [Close] */
+        padding: 0 4px; /* Symmetrical L/R padding */
+    }
+
+    .tab-icon {
+        /* Hide the icon */
+        display: none;
+    }
+}
+
+
+.tab:hover { 
+    background-color: rgba(55, 55, 56, 0.8); 
+}
+
+.tab.active {
+    margin: 0 4px;
+    /* Padding adjusted for grid */
+    padding-left: 11px;
+    padding-right: 7px;
+    border-width: 1px;
+    border-style: solid;
+    color: #ffffff;
+}
+/* Padding for active tab when it is also compact */
+@container (max-width: 100px) {
+    .tab.active {
+        padding: 0 7px; /* Symmetrical L/R padding */
+    }
+}
+
+/* When active, the close button is more visible */
+.tab.active .tab-close svg {
+    opacity: 0.9;
+}
+/*=====  End of Component: Tabs  ======*/
+
+/*=============================================
+=            Panel Themes (Green/Blue)        =
+=============================================*/
+/* --- Green Theme: Left Panel (Data) --- */
+#left-panel .panel-toolbar { 
+    border-bottom: 1px solid var(--gradient-color-top-left); 
+}
+
+#left-panel .tab {
+    border-bottom-color: var(--gradient-color-top-left);
+}
+
+#left-panel .tab.active {
+    background-color: #00ff9922;
+    border-top-color: var(--gradient-color-top-left);
+    border-left-color: var(--gradient-color-top-left);
+    border-right-color: var(--gradient-color-top-left);
+    border-bottom-color: var(--panel-background);
+}
+
+/* --- Blue Theme: Right Panel (Templates) --- */
+#right-panel .panel-toolbar { 
+    border-bottom: 1px solid var(--gradient-color-bottom-right); 
+}
+
+#right-panel .tab {
+    border-bottom-color: var(--gradient-color-bottom-right);
+}
+
+#right-panel .tab.active {
+    background-color: #00c9ff22;
+    border-top-color: var(--gradient-color-bottom-right);
+    border-left-color: var(--gradient-color-bottom-right);
+    border-right-color: var(--gradient-color-bottom-right);
+    border-bottom-color: var(--panel-background);
+}
+/*=====  End of Panel Themes (Green/Blue)  ======*/
+
+/*=============================================
+=            Component: Icon Buttons (REMOVED) =
+=============================================*/
+/* * .icon-button rule removed as it's no longer used for toolbar actions
+ */
+/*=====  End of Component: Icon Buttons (REMOVED)  ======*/
+
+/*=============================================
+=            Panel Content (Tabs)             =
+=============================================*/
+.panel-content { 
+    padding: 0;
+    flex-grow: 1; 
+    position: relative;
+    overflow: hidden; 
+}
+
+@keyframes contentFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* These are the correct rules for the "box-inset" */
+.tab-content {
+    width: calc(100% - 40px);
+    height: calc(100% - 40px);
+    margin: 20px;
+    
+    display: none;
+    overflow: hidden; 
+    padding: 0; 
+}
+
+.tab-content.active {
+    display: block;
+    animation: contentFadeIn 0.4s ease-out forwards;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+}
+/*=====  End of Panel Content (Tabs)  ======*/
+
+/*=============================================
+=            Left Panel Layout (Flex)         =
+=============================================*/
+/* The layout wrapper (CHILD of .tab-content) */
+.tab-content-grid {
+    display: flex; /* [MODIFIED] */
+    flex-direction: column; /* [NEW] */
+    
+    width: 100%;
+    height: 100%;
+    
+    overflow: hidden; /* Contain any internal overflow */
+}
+
+/* Row 1: File Path */
+.status-bar__path {
+    flex-shrink: 0; /* [NEW] Do not allow shrinking */
+    padding: 10px 20px; /* Compact padding */
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--meta-bg-crystal); /* Subtle crystal background */
+    
+    overflow: hidden; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.status-bar__path span {
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 13px;
+    color: var(--font-color);
+    opacity: 0.9; /* [MODIFIED] Increased opacity from 0.7 to 0.9 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block; /* for text-overflow to work */
+    font-weight: 400; /* [MODIFIED] Increased weight from 300 to 400 */
+}
+
+
+/* Row 2: Tree Wrapper */
+.tree-wrapper {
+    position: relative; /* Container for the tree */
+    overflow: hidden; /* Ensures tree does not overflow grid */
+    flex-grow: 1; /* [NEW] Tree takes all remaining space */
+    min-height: 0; /* [NEW] Critical for preventing overflow in flex */
+}
+
+
+/* Row 3: Metadata Bar */
+.meta-bar {
+    flex-shrink: 0; /* [NEW] Do not allow shrinking */
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px 16px;
+    border-top: 1px solid var(--border-color);
+    background-color: var(--meta-bg-crystal);
+    overflow: hidden;
+}
+
+/* [MODIFIED] Single Metadata Row */
+.meta-bar-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap; /* [NEW] Allows items to wrap to the next line */
+    gap: 6px;
+    justify-content: center;
+
+    align-items: center;
+}
+
+/* Individual metadata box */
+.meta-stat-box {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Centered content */
+    
+    /* [MODIFIED] 
+     * flex-grow: 1 (Grow to fill space)
+     * flex-shrink: 1 (Shrink if needed)
+     * flex-basis: 0 (Your base size is 0, not 100px)
+     */
+    flex: 1 1 0; 
+
+    /* [NEW]
+     * Define the breakpoint. Don't shrink below 100px.
+     * If you don't fit, the parent's 'flex-wrap' will move you.
+     */
+    min-width: fit-content;
+    max-width: 70px; 
+    
+    background-color: var(--meta-bg-crystal);
+    border: 1px solid var(--meta-border-crystal);
+    border-radius: 3px;
+    padding: 3px 6px;
+    
+    font-size: 8pt;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+/* TOP row boxes: ROW layout */
+.meta-stat-box--top {
+    flex-direction: row;
+     
+}
+
+/* BOTTOM row boxes: COLUMN layout */
+.meta-stat-box--bottom {
+ flex-direction: row;
+ gap: 2px;
+}
+
+/* Label and Value */
+.meta-stat-label,
+.meta-stat-value {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.meta-stat-label {
+    color: var(--font-color);
+    opacity: 0.7;
+    font-weight: 300;
+}
+
+.meta-stat-value {
+    color: #ffffff;
+    font-weight: 400; /* [MODIFIED] Reduced from 500 to 400 */
+}
+/*=====  End of Left Panel Layout (Flex)  ======*/
+
+/*=============================================
+=            Component: Paneton Tree          =
+=============================================*/
+.paneton-tree-container {
+    background-color: transparent !important; 
+    border: none;
+    height: 100%;
+    width: 100%;
+    overflow: hidden; 
+    
+    /* Padding adjusted for layout */
+    padding: 15px 20px 15px 20px;
+    box-sizing: border-box;
+}
+
+ [data-paneton-tree] {   
+    --pntn-tree-color-node-background-hover: #3b3b3b1a;   
+    --pntn-tree-color-node-background-selected: var(--gradient-color-top-left-transparent);
+ }
+/*=====  End of Component: Paneton Tree  ======*/
+
+/*=============================================
+=            Placeholders (Empty Panels)      =
+=============================================*/
+.placeholder { 
+    color: rgba(255, 255, 255, 0.6); 
+    
+    /* Positioning to fill the .tab-content area */
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    bottom: 20px;
+    overflow: auto; 
+}
+
+.placeholder-frame { 
+    border: 1px dashed var(--dashed-border-color); 
+    border-radius: 6px; 
+    padding: 20px; 
+    box-sizing: border-box; 
+    
+    width: 100%;
+    height: 100%;
+}
+
+.placeholder h2 { 
+    margin-top: 0; 
+    color: #fff; 
+    font-weight: 500; 
+    border-bottom: 1px solid var(--border-color); 
+    padding-bottom: 10px; 
+    margin-bottom: 15px; 
+}
+/*=====  End of Placeholders (Empty Panels)  ======*/
+
+/*=============================================
+=            Component: Resizer               =
+=============================================*/
+.resizer {
+    width: var(--resizer-width);
+    background-color: transparent;
+    cursor: col-resize;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 4px;
+}
+
+.resizer::after {
+    content: '';
+    width: 2px;
+    height: 40px;
+    background-color: var(--border-color);
+    border-radius: 2px;
+    transition: background-color 0.2s ease;
+}
+
+.resizer:hover::after { 
+    background-color: var(--hover-color); 
+}
+/*=====  End of Component: Resizer  ======*/
+
+/*=============================================
+=            Component: Action Tab (NEW)      =
+=============================================*/
+/*
+ * This targets the #load-sheet-button and #load-template-button,
+ * which have class .tab but function as action buttons.
+*/
+#load-sheet-button,
+#load-template-button {
+    /* Override .tab flex/sizing */
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
+    min-width: 32px;
+    max-width: 32px;
+    padding: 0;
+    margin-left: 2px; /* Spacing from other tabs */
+
+    /* Override .tab grid to center icon */
+    display: grid;
+    grid-template-columns: 1fr;
+    place-items: center;
+}
+
+/* Style the injected SVG */
+#load-sheet-button svg,
+#load-template-button svg {
+    width: 16px;
+    height: 16px;
+    stroke: var(--font-color);
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+/* Hover state for SVG */
+#load-sheet-button:hover svg,
+#load-template-button:hover svg {
+    opacity: 1;
+}
+
+/* Override .tab.active state */
+#load-sheet-button.active,
+#load-template-button.active {
+    background-color: var(--tab-bg);
+    color: var(--font-color);
+    margin: 0 0.5px; /* Reset from .tab.active */
+    padding: 0; /* Reset from .tab.active */
+
+    /* Reset active borders to look inactive */
+    border-top-color: var(--border-color);
+    border-left-color: var(--border-color);
+    border-right-color: var(--border-color);
+}
+
+/* Ensure bottom border color is correct on active override */
+#left-panel #load-sheet-button.active {
+    border-bottom-color: var(--gradient-color-top-left);
+}
+#right-panel #load-template-button.active {
+    border-bottom-color: var(--gradient-color-bottom-right);
+}
+
+/* Remove query-based padding overrides */
+@container (max-width: 100px) {
+    #load-sheet-button.active,
+    #load-template-button.active {
+        padding: 0;
+    }
+    
+    /* Fix for compact action tab grid */
+    #load-sheet-button,
+    #load-template-button {
+        grid-template-columns: 1fr;
+        padding: 0;
+    }
+}
+/*=====  End of Component: Action Tab (NEW)  ======*/

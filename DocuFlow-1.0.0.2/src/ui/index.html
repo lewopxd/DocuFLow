@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+
+    <title>DocuFlow Engine Playground</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="main-container">
+        <div id="left-panel" class="panel">
+            <div class="panel-toolbar">
+                <div class="toolbar-tabs" id="left-tabs">
+                    <div class="tab" id="load-sheet-button" title="Cargar hoja de datos"></div>
+                </div>
+            </div>
+            <div class="panel-content">
+                <div class="placeholder">
+                    <div class="placeholder-frame">
+                        <h2>Panel de Datos</h2>
+                        <p>Aquí se visualizarán los datos del archivo de Google Sheets.</p>
+                    </div>
+                </div>
+                </div>
+        </div>
+
+        <div id="resizer" class="resizer"></div>
+
+        <div id="right-panel" class="panel">
+            <div class="panel-toolbar">
+                <div class="toolbar-tabs" id="right-tabs">
+                    <div class="tab" id="load-template-button" title="Cargar template"></div>
+                </div>
+            </div>
+            <div class="panel-content">
+                <div class="placeholder">
+                    <div class="placeholder-frame">
+                        <h2>Panel de Plantillas</h2>
+                        <p>Aquí se mostrarán las variables encontradas en las plantillas de Word cargadas.</p>
+                    </div>
+                </div>
+                </div>
+        </div>
+    </div>
+
+    <script src="js/providers/python/python-bridge.js"></script>
+    
+    <script src="js/lib/pntn.tree.js"></script>
+
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
