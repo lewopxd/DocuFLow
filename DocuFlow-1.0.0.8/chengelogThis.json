@@ -1,0 +1,121 @@
+{
+    "session": "2025-12-11",
+    "changes": [
+        {
+            "id": 1,
+            "timestamp": "2025-12-10T23:35:00-05:00",
+            "type": "UI_FIX",
+            "title": "Corrección de altura inconsistente en tarjetas de mapping",
+            "description": "Las tarjetas del panel de plantillas tenían alturas diferentes entre filas. Se añadió 'align-items: center' al grid del panel izquierdo para asegurar alineación vertical uniforme.",
+            "files": [
+                "src/ui/modules/templates-panel/templates-panel.css"
+            ],
+            "details": {
+                "bugFixed": "Tarjetas con diferentes alturas en el grid de mapping",
+                "solution": "Añadido align-items: center a .mapping-left-panel",
+                "lineChanged": 434
+            }
+        },
+        {
+            "id": 2,
+            "timestamp": "2025-12-11T00:06:00-05:00",
+            "type": "UX_IMPROVEMENT",
+            "title": "Spinner inmediato al cargar archivos en Data Panel",
+            "description": "Modificado el flujo de carga para mostrar el spinner inmediatamente después de que el usuario selecciona un archivo, antes de cargar la estructura de datos. Proporciona feedback visual instantáneo.",
+            "files": [
+                "src/ui/modules/data-panel/data-panel.js"
+            ],
+            "details": {
+                "functionsModified": [
+                    "handleLoadSheetWorkflow",
+                    "loadAndRestoreSession_Data",
+                    "addTab"
+                ],
+                "newFunctions": [
+                    "buildContentGrid"
+                ],
+                "behaviorChange": "Tab con spinner se crea antes de llamar a getExcelStructure(), no después"
+            }
+        },
+        {
+            "id": 3,
+            "timestamp": "2025-12-11T00:12:00-05:00",
+            "type": "UI_FIX",
+            "title": "Footer fijo en vista de Excel Viewer",
+            "description": "El contenedor de spreadsheet se encogía al cargar datos, haciendo que el footer subiera. Se añadieron estilos para que el spreadsheet-wrapper ocupe todo el espacio disponible.",
+            "files": [
+                "src/ui/modules/data-panel/data-panel.css"
+            ],
+            "details": {
+                "bugFixed": "Meta-bar flotando arriba cuando debía estar pegada al borde inferior",
+                "solution": "Añadidos estilos para .spreadsheet-wrapper con flex: 1 y min-height: 0",
+                "stylesAdded": ".spreadsheet-wrapper, .spreadsheet-wrapper .loading-spinner-container"
+            }
+        },
+        {
+            "id": 4,
+            "timestamp": "2025-12-11T00:15:00-05:00",
+            "type": "FEATURE",
+            "title": "Celdas de header seleccionables en Excel Viewer",
+            "description": "Las celdas de la fila 1 (nombres de columnas) ahora son seleccionables con el mismo estilo de selección que las celdas de datos.",
+            "files": [
+                "src/ui/js/lib/excel-viewer.js"
+            ],
+            "details": {
+                "functionsModified": [
+                    "_setupEventListeners",
+                    "_selectCell",
+                    "_clearSelection"
+                ],
+                "newBehavior": "Click en celdas de thead activa selección igual que tbody",
+                "visualChange": "Header row 1 muestra highlight azul al seleccionar celdas"
+            }
+        },
+        {
+            "id": 5,
+            "timestamp": "2025-12-11T01:42:00-05:00",
+            "type": "FEATURE",
+            "title": "Sistema de Archivos de Proyecto (.bkproj)",
+            "description": "Implementación completa de persistencia de proyectos con formato .bkproj. Incluye auto-guardado cada 10s, restauración automática al inicio, y guardado de estado de paneles, tabs, mappings y layout.",
+            "files": [
+                "src/core/file_helpers/project_manager.py",
+                "src/core/file_helpers/storage.py",
+                "src/main.py",
+                "src/ui/js/project-manager.js",
+                "src/ui/js/providers/python/provider.python.js",
+                "src/ui/js/services.js",
+                "src/ui/js/main.js",
+                "src/ui/js/uiHelpers.js",
+                "src/ui/modules/data-panel/data-panel.js",
+                "src/ui/modules/templates-panel/templates-panel.js"
+            ],
+            "details": {
+                "newFiles": [
+                    "src/core/file_helpers/project_manager.py",
+                    "src/ui/js/project-manager.js"
+                ],
+                "backendHandlers": [
+                    "get_project_info",
+                    "load_project",
+                    "save_project",
+                    "new_project"
+                ],
+                "frontendFeatures": [
+                    "ProjectAutoSave class con timer y dirty flag",
+                    "collectProjectState() para exportar estado",
+                    "applyProjectState() para restaurar UI",
+                    "exportPanelState/importPanelState en ambos paneles"
+                ],
+                "storageLocation": "%APPDATA%/DocuFlow/default.bkproj",
+                "statesPersisted": [
+                    "Tabs abiertos (data y templates)",
+                    "Tab activo",
+                    "Mappings bloqueados",
+                    "Tamaños de paneles (layout)",
+                    "ViewMode (tree/spreadsheet)"
+                ],
+                "autoSaveInterval": "10 segundos (testing)"
+            }
+        }
+    ]
+}

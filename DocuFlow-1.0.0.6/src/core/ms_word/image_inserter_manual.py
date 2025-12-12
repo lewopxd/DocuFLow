@@ -6,11 +6,17 @@ Project: DocuFlow
 File:  image_inserter_manual.py
 Created: 2025-11-06
 Author: @lewopxd
-Last Updated: 2025-11-06
+Last Updated: 2025-12-07
 
 Description:
-The "Nuclear Option" for image insertion - CORRECTED v5.
+The "Nuclear Option" for image insertion - v6.
 (100% Functional, Error-Proof, with alignment support and robust placeholder search)
+
+v6 CHANGELOG:
+- Added `on_missing` policy for image placeholders (analogous to text replacement)
+- Supports: "REMOVE_PLACEHOLDER" | "KEEP_PLACEHOLDER" | "FAIL"
+- If image_path is None/invalid and on_missing="REMOVE_PLACEHOLDER", the placeholder
+  paragraph is removed from the document.
 
 This module replaces python-docx's saving mechanism entirely.
 It performs a manual ZIP-to-ZIP transformation with:
@@ -18,6 +24,7 @@ It performs a manual ZIP-to-ZIP transformation with:
 - Full alignment support (LEFT/CENTER/RIGHT/JUSTIFY)
 - Search in body, headers, footers, and tables
 - Complete layout_policy integration
+- Missing image handling with on_missing policy
 """
 
 import os
@@ -50,7 +57,7 @@ try:
     import docx
     from docx.document import Document as DocxDocument
 except ImportError as e:
-    print(f"❌ CRITICAL (ImageInserterManual): No se pudieron importar módulos del Core.")
+    print(f"⚠️ CRITICAL (ImageInserterManual): No se pudieron importar módulos del Core.")
     print(f"   Error: {e}")
     sys.exit(1)
 
@@ -291,10 +298,65 @@ def _find_and_replace_placeholder_p_robust(
     
     return False
 
+
+# --- [ INICIO: NUEVA FUNCIÓN v6 - REMOVER PLACEHOLDER ] ---
+
+def _remove_placeholder_paragraph(
+    root: etree._Element, 
+    placeholder_text: str, 
+    debug: bool = False
+) -> bool:
+    """
+    NUEVA FUNCIÓN v6: Busca y ELIMINA completamente el párrafo que contiene el placeholder.
+    Usado cuando on_missing="REMOVE_PLACEHOLDER".
+    
+    Returns:
+        True si encontró y eliminó el placeholder, False si no lo encontró.
+    """
+    all_paragraphs = root.xpath(".//w:p", namespaces=XML_NS_MAP)
+    
+    for p in all_paragraphs:
+        text_nodes = p.xpath(".//w:t", namespaces=XML_NS_MAP)
+        
+        if not text_nodes:
+            continue
+        
+        full_text, _ = _reconstruct_text_with_buffer(text_nodes)
+        
+        if placeholder_text not in full_text:
+            continue
+        
+        # ¡Placeholder encontrado! - ELIMINAR el párrafo completo
+        if debug:
+            print(f"    [DEBUG] REMOVE: Placeholder '{placeholder_text}' encontrado - ELIMINANDO párrafo completo.")
+        
+        parent_of_p = p.getparent()
+        if parent_of_p is None:
+            if debug:
+                print(f"    [DEBUG] REMOVE: No se pudo encontrar el padre del párrafo.")
+            return False
+        
+        # Eliminar el párrafo del documento
+        parent_of_p.remove(p)
+        
+        if debug:
+            print(f"    [DEBUG] REMOVE: Párrafo con placeholder '{placeholder_text}' eliminado exitosamente.")
+        
+        return True
+    
+    if debug:
+        print(f"    [DEBUG] REMOVE: No se encontró el párrafo con el placeholder '{placeholder_text}'")
+    
+    return False
+
+# --- [ FIN: NUEVA FUNCIÓN v6 - REMOVER PLACEHOLDER ] ---
+
+
 def _process_xml_part(
     zip_read: zipfile.ZipFile,
     part_name: str,
     placeholder_to_data: Dict[str, Tuple[str, str, int, int, str]],
+    placeholders_to_remove: Set[str],  # ← NUEVO v6: Set de placeholders a eliminar
     doc_id_counter: int,
     pic_id_counter: int,
     placeholder_to_rId: Dict[str, str],
@@ -303,7 +365,9 @@ def _process_xml_part(
     debug: bool = False
 ) -> Tuple[bytes, int, int]:
     """
-    Procesa una parte XML (document.xml, header.xml, footer.xml) y reemplaza placeholders.
+    Procesa una parte XML (document.xml, header.xml, footer.xml) y reemplaza/elimina placeholders.
+    
+    v6 CAMBIO: Ahora acepta `placeholders_to_remove` para eliminar placeholders sin imagen.
     
     Returns:
         (xml_bytes_modificado, nuevo_doc_id_counter, nuevo_pic_id_counter)
@@ -317,6 +381,7 @@ def _process_xml_part(
     
     modified = False
     
+    # --- PASO 1: REEMPLAZAR placeholders con imágenes ---
     for placeholder, (clean_path, _, width, height, alignment) in placeholder_to_data.items():
         # Saltar si ya falló en otro documento
         if placeholder in [f["placeholder"] for f in failed_list]:
@@ -350,6 +415,19 @@ def _process_xml_part(
             if debug:
                 print(f"    [DEBUG] ✅ Placeholder '{placeholder}' procesado en {part_name}")
     
+    # --- PASO 2: ELIMINAR placeholders sin imagen (on_missing="REMOVE_PLACEHOLDER") ---
+    for placeholder in placeholders_to_remove:
+        if placeholder in processed_list:
+            continue  # Ya fue procesado con imagen
+        
+        success = _remove_placeholder_paragraph(xml_root, placeholder, debug)
+        
+        if success:
+            processed_list.append(placeholder)
+            modified = True
+            if debug:
+                print(f"    [DEBUG] 🗑️  Placeholder '{placeholder}' ELIMINADO en {part_name}")
+    
     if modified:
         return etree.tostring(xml_root, encoding="UTF-8", xml_declaration=True), doc_id_counter, pic_id_counter
     else:
@@ -364,19 +442,33 @@ def _process_xml_part(
 
 def generate_document_with_images_manual(config: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Función de inserción manual (Opción Nuclear) - CORREGIDA v5.
+    Función de inserción manual (Opción Nuclear) - v6.
     100% funcional, a prueba de errores, con soporte completo de layout_policy.
+    
+    v6 NUEVA CARACTERÍSTICA:
+    Cada job en image_map puede tener un parámetro `on_missing`:
+    
+    job = {
+        "placeholder": "$IMG{{...}}",
+        "image_path": "/path/to/image.png",  # Puede ser None
+        "layout_policy": {...},
+        "on_missing": "REMOVE_PLACEHOLDER" | "KEEP_PLACEHOLDER" | "FAIL"  # ← NUEVO v6
+    }
+    
+    - "REMOVE_PLACEHOLDER": Elimina el párrafo placeholder del documento
+    - "KEEP_PLACEHOLDER": Deja el placeholder visible en el documento (default)
+    - "FAIL": Lanza excepción y detiene el proceso
     """
     status_report = {
         "success": False,
         "source_path": config.get("source_path"),
         "target_path": None,
         "error": None,
-        "details": {"images_processed": [], "images_failed": []}
+        "details": {"images_processed": [], "images_failed": [], "images_removed": []}  # ← NUEVO v6: images_removed
     }
     
     debug = config.get("debug", False)
-    if debug: print(f"--- [INICIO TRABAJO MANUAL DE IMAGEN v5 (DEBUG)] ---")
+    if debug: print(f"--- [INICIO TRABAJO MANUAL DE IMAGEN v6 (DEBUG)] ---")
 
     source_path = config.get("source_path")
     target_dir = config.get("target_directory")
@@ -386,8 +478,8 @@ def generate_document_with_images_manual(config: Dict[str, Any]) -> Dict[str, An
     temp_dir = None
     
     try:
-        if not all([source_path, target_dir, target_filename, image_map]):
-            raise ValueError("Config incompleta.")
+        if not all([source_path, target_dir, target_filename]):
+            raise ValueError("Config incompleta (falta source_path, target_directory o target_filename).")
 
         target_path = Path(target_dir) / target_filename
         status_report["target_path"] = str(target_path)
@@ -403,6 +495,7 @@ def generate_document_with_images_manual(config: Dict[str, Any]) -> Dict[str, An
         
         # --- Pre-procesamiento de Imágenes ---
         placeholder_to_data = {}  # tag -> (clean_path, ext, width, height, alignment)
+        placeholders_to_remove = set()  # ← NUEVO v6: Placeholders a eliminar
         
         with create_safe_temp_copy(source_path) as temp_doc_path:
             if not temp_doc_path:
@@ -417,7 +510,47 @@ def generate_document_with_images_manual(config: Dict[str, Any]) -> Dict[str, An
                 placeholder = job.get("placeholder")
                 dirty_path = job.get("image_path")
                 policy = job.get("layout_policy", {})
+                on_missing = job.get("on_missing", "KEEP_PLACEHOLDER")  # ← NUEVO v6: Default policy
                 
+                # --- NUEVA LÓGICA v6: Validar image_path ---
+                if not dirty_path or not os.path.exists(dirty_path):
+                    # Imagen faltante o path inválido
+                    
+                    if on_missing == "FAIL":
+                        # Política FAIL: Detener todo el proceso
+                        raise FileNotFoundError(
+                            f"Imagen crítica no encontrada para placeholder '{placeholder}': {dirty_path}"
+                        )
+                    
+                    elif on_missing == "REMOVE_PLACEHOLDER":
+                        # Política REMOVE: Marcar para eliminación
+                        placeholders_to_remove.add(placeholder)
+                        status_report["details"]["images_removed"].append(placeholder)
+                        if debug:
+                            print(f"  [DEBUG] Imagen no encontrada '{placeholder}' - Marcado para ELIMINACIÓN")
+                        continue  # No procesar imagen
+                    
+                    elif on_missing == "KEEP_PLACEHOLDER":
+                        # Política KEEP: Dejar placeholder en el documento
+                        status_report["details"]["images_failed"].append({
+                            "placeholder": placeholder, 
+                            "error": f"Imagen no encontrada (KEEP_PLACEHOLDER): {dirty_path}"
+                        })
+                        if debug:
+                            print(f"  [DEBUG] Imagen no encontrada '{placeholder}' - MANTENIENDO placeholder")
+                        continue  # No procesar imagen
+                    
+                    else:
+                        # Política desconocida: Usar KEEP como fallback
+                        if debug:
+                            print(f"  [DEBUG] on_missing desconocido '{on_missing}' - usando KEEP_PLACEHOLDER")
+                        status_report["details"]["images_failed"].append({
+                            "placeholder": placeholder, 
+                            "error": f"Imagen no encontrada: {dirty_path}"
+                        })
+                        continue
+                
+                # --- LÓGICA ORIGINAL: Imagen existe, procesarla ---
                 try:
                     # Primero, abrir la imagen para obtener dimensiones originales
                     from PIL import Image
@@ -492,7 +625,8 @@ def generate_document_with_images_manual(config: Dict[str, Any]) -> Dict[str, An
             # 3a. Documento principal
             doc_xml, doc_id_counter, pic_id_counter = _process_xml_part(
                 zip_read, "word/document.xml",
-                placeholder_to_data, doc_id_counter, pic_id_counter,
+                placeholder_to_data, placeholders_to_remove,  # ← NUEVO v6: Pasar placeholders_to_remove
+                doc_id_counter, pic_id_counter,
                 placeholder_to_rId, status_report["details"]["images_failed"],
                 processed_placeholders, debug
             )
@@ -505,7 +639,8 @@ def generate_document_with_images_manual(config: Dict[str, Any]) -> Dict[str, An
                     if item.endswith(".xml"):
                         part_xml, doc_id_counter, pic_id_counter = _process_xml_part(
                             zip_read, item,
-                            placeholder_to_data, doc_id_counter, pic_id_counter,
+                            placeholder_to_data, placeholders_to_remove,  # ← NUEVO v6: Pasar placeholders_to_remove
+                            doc_id_counter, pic_id_counter,
                             placeholder_to_rId, status_report["details"]["images_failed"],
                             processed_placeholders, debug
                         )
@@ -521,6 +656,12 @@ def generate_document_with_images_manual(config: Dict[str, Any]) -> Dict[str, An
                         "placeholder": placeholder,
                         "error": "No se pudo encontrar el párrafo placeholder en ningún XML"
                     })
+            
+            # Verificar placeholders eliminados
+            for placeholder in placeholders_to_remove:
+                if placeholder not in processed_placeholders:
+                    if debug:
+                        print(f"  [DEBUG] ⚠️  Placeholder '{placeholder}' marcado para eliminación pero no encontrado en XML")
             
             # 4. Copiar todos los demás archivos
             written_files = {"[Content_Types].xml", "word/_rels/document.xml.rels", "word/document.xml"}
@@ -543,6 +684,7 @@ def generate_document_with_images_manual(config: Dict[str, Any]) -> Dict[str, An
         
         if debug: print(f"  [DEBUG] Transformación ZIP-a-ZIP completada. Archivo guardado en: {target_path}")
         
+        # Determinar éxito
         if not status_report["details"]["images_failed"]:
             status_report["success"] = True
         else:
@@ -565,5 +707,11 @@ def generate_document_with_images_manual(config: Dict[str, Any]) -> Dict[str, An
             except OSError as e:
                 print(f"  [ERROR] No se pudo eliminar el directorio temporal: {e}")
     
-    if debug: print(f"--- [FIN TRABAJO MANUAL DE IMAGEN v5 (DEBUG)] ---")
+    if debug: 
+        print(f"  [RESUMEN v6]")
+        print(f"    Imágenes procesadas: {len(status_report['details']['images_processed'])}")
+        print(f"    Imágenes fallidas: {len(status_report['details']['images_failed'])}")
+        print(f"    Placeholders eliminados: {len(status_report['details']['images_removed'])}")
+        print(f"--- [FIN TRABAJO MANUAL DE IMAGEN v6 (DEBUG)] ---")
+    
     return status_report

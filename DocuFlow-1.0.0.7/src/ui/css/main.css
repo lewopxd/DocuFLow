@@ -1,0 +1,386 @@
+/*
+ * Project: DocuFlow
+ * File:  main.css
+ * Created: 2025-10-30 (Refactored)
+ * Author: @lewopxd
+ *
+ * Description:
+ * Main application shell stylesheet.
+ * Defines global variables, base styles, and the main layout grid.
+ * Does NOT contain module-specific (panel) styles.
+ */
+
+/*=============================================
+=            Global CSS Variables             =
+=============================================*/
+:root {
+    --resizer-width: 8px;
+    --panel-background: rgba(22, 22, 22, 0.5);
+    --border-color: rgba(255, 255, 255, 0.15);
+    --dashed-border-color: rgba(255, 255, 255, 0.3);
+    --hover-color: #007acc;
+    --font-color: #cccccc;
+    --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --tab-bg: rgba(45, 45, 45, 0.6);
+    --tab-height: 22px;
+    
+    /* Base accent colors */
+    --accent-color-1-green: #00ff99;
+    --accent-color-2-blue: #00c9ff;
+    
+    /* Module themes are now derived from base accents */
+    --gradient-color-top-left: var(--accent-color-1-green);     /* Green */
+    --gradient-color-bottom-right: var(--accent-color-2-blue);  /* Blue */
+
+    /* NEW: Transparent versions for themes */
+    --accent-color-1-green-transparent: #00ff9922;
+    --accent-color-2-blue-transparent: #00c9ff22;
+    
+    --gradient-color-top-left-transparent: var(--accent-color-1-green-transparent); 
+    
+    /* Module-specific variables */
+    --meta-bg-crystal: rgba(30, 30, 30, 0.4); 
+    --meta-border-crystal: rgba(255, 255, 255, 0.1);
+}
+/*=====  End of Global CSS Variables  ======*/
+
+/*=============================================
+=            Reset and Base Style             =
+=============================================*/
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    font-family: var(--font-family);
+    color: var(--font-color);
+    background-color: #1e1e1e;
+    
+    /* High-Quality embedded SVG Background */
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g1" gradientTransform="rotate(135)"><stop offset="0%" stop-color="%231e1e1e"/><stop offset="50%" stop-color="%232d2d30"/><stop offset="100%" stop-color="%231a2a3a"/></linearGradient><radialGradient id="g2" cx="0" cy="0" r="80%"><stop offset="0%" stop-color="%2300ff99" stop-opacity="0.25"/><stop offset="100%" stop-color="%231e1e1e" stop-opacity="0"/></radialGradient><radialGradient id="g3" cx="100%" cy="100%" r="80%"><stop offset="0%" stop-color="%2300c9ff" stop-opacity="0.25"/><stop offset="100%" stop-color="%231e1e1e" stop-opacity="0"/></radialGradient></defs><rect width="100%" height="100%" fill="url(%23g1)"/><rect width="100%" height="100%" fill="url(%23g2)"/><rect width="100%" height="100%" fill="url(%23g3)"/></svg>');
+    background-size: cover;
+    background-repeat: no-repeat;
+   
+}
+/*=====  End of Reset and Base Style  ======*/
+
+/*=============================================
+=            Main Layout (App Shell)          =
+=============================================*/
+.main-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* * Column Container
+ * This holds the vertical stack of panels (top/bottom)
+ * and *also* acts as the visible .panel
+*/
+.panel-column {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    /* Default layout for columns */
+    flex-grow: 1;
+    flex-basis: 50%;
+}
+
+/* * Common Panel Styles (The Shell)
+ * This is the generic container style for the *columns*.
+*/
+.panel {
+    background-color: var(--panel-background);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-sizing: border-box;
+    overflow: hidden;
+    /* MODIFIED: Aligned with uiHelpers.js minWidthPx*/
+    min-width: 150px; 
+    transition: background-color 0.3s ease;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    
+    /* The panel itself is a flex container */
+    display: flex;
+    flex-direction: column;
+}
+
+/* * NEW: Panel Slot
+ * This is the *invisible* container *inside* a .panel-column
+ * where modules are loaded. No borders, no background.
+*/
+.panel-slot {
+    /* Added Flex properties to manage internal layout */
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    flex-basis: 50%; /* Default 50/50 split */
+    overflow: hidden;
+    position: relative; /* For correct layout of internal content */
+    /* MODIFIED: Changed min-height from 50px to 0*/
+    min-height: 0; 
+    
+    /* NEW: Add transition for smooth collapse*/
+    transition: max-height 0.3s ease-out, min-height 0.3s ease-out, flex-grow 0.3s ease-out, flex-basis 0.3s ease-out;
+}
+
+
+/* * Layout definitions for the static panel columns 
+ * from main.html
+*/
+#left-column { 
+    flex-basis: 50%; 
+    flex-grow: 0; 
+    flex-shrink: 0; 
+}
+
+#right-column { 
+    flex-grow: 1; 
+}
+/*=====  End of Main Layout (App Shell)  ======*/
+
+
+/*=============================================
+=            Global Component: Resizer        =
+=============================================*/
+.resizer {
+    /* Base styles for all resizers */
+    background-color: transparent;
+    flex-shrink: 0;
+    /* MODIFIED: Added max-height and opacity transitions for collapse*/
+    transition: background-color 0.2s ease, max-height 0.3s ease-out, opacity 0.3s ease-out,
+                height 0.3s ease-out, margin 0.3s ease-out;
+}
+
+/* * Vertical Resizer (Main)
+*/
+.resizer-vertical {
+    width: var(--resizer-width);
+    cursor: col-resize;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 4px;
+}
+
+.resizer-vertical::after {
+    content: '';
+    width: 2px;
+    height: 40px;
+    background-color: var(--border-color);
+    border-radius: 2px;
+    transition: background-color 0.2s ease;
+}
+
+.resizer-vertical:hover::after { 
+    background-color: var(--hover-color); 
+}
+
+/* * NEW: Horizontal Resizer (Fine Line)
+*/
+.resizer-horizontal {
+    height: var(--resizer-width); /* Invisible grab area */
+    width: 100%;
+    cursor: row-resize;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* No margin, seamless line */
+    margin: 0; 
+    /* NEW: Needed for collapse animation*/
+    max-height: 8px; /* (matches height) */
+    opacity: 1;
+}
+
+.resizer-horizontal::after {
+    content: '';
+    height: 1px; /* The visible "fine line" */
+    width: 100%;
+    background-color: var(--border-color);
+    transition: background-color 0.2s ease;
+}
+
+.resizer-horizontal:hover::after {
+    background-color: var(--hover-color);
+}
+/*=====  End of Global Component: Resizer  ======*/
+
+/*=============================================
+=     Global Component: Module Window (NEW)   =
+=============================================*/
+/* * This logic is now GLOBAL (moved from data-panel.css)
+ * main.js creates this structure for every module.
+*/
+.module-window-frame {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+.module-title-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    flex-shrink: 0;
+    
+    background-color: transparent;
+    border-bottom: 1px solid var(--border-color);
+    /* FIX FLASH: El borde existe pero es invisible (color transparente). */
+    border-top: 1px solid rgba(0,0,0,0); 
+    position: relative;
+    /* Se añade border-color a la transición para un cambio suave de transparente a blanco. */
+    transition: background-color 0.3s ease, border-bottom 0.3s ease, border-top 0.3s ease, border-color 0.3s ease; 
+}
+
+/* * MODIFIED: Theme-aware coloring for EXPANDED (default) title bars
+ * Se mantiene el borde superior invisible (color transparente) para evitar superposición.
+*/
+#left-column .panel-slot:not(.is-panel-collapsed) .module-title-bar {
+    background-color: var(--accent-color-1-green-transparent);
+    border-top: 1px solid rgba(0,0,0,0); /* Mantiene el espacio sin superponerse */
+    border-bottom: 1px solid var(--border-color);
+}
+#right-column .panel-slot:not(.is-panel-collapsed) .module-title-bar {
+    background-color: var(--accent-color-2-blue-transparent);
+    border-top: 1px solid rgba(0,0,0,0); /* Mantiene el espacio sin superponerse */
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* NEW FIX: Cuando el panel *colapsa*, el borde superior se vuelve visible.
+ * Esto transiciona el *color* del borde de transparente a sólido.
+*/
+.panel-slot.is-panel-collapsed .module-title-bar {
+    background-color: transparent;
+    border-top: 1px solid var(--border-color); /* Transiciona el color, no la existencia */
+    border-bottom: 1px solid var(--border-color);
+}
+
+.module-icon-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.module-icon-container svg {
+    width: 14px;
+    height: 14px;
+    stroke: var(--font-color);
+    opacity: 0.6;
+}
+
+.module-title {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--font-color);
+    opacity: 0.8;
+    white-space: nowrap;
+}
+
+/* Collapse Button */
+.module-collapse-button {
+    position: absolute;
+    right: 5px; 
+    top: 50%;
+    /* MODIFIED: Set transform base state*/
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: background-color 0.2s ease;
+}
+.module-collapse-button svg {
+    width: 14px;
+    height: 14px;
+    stroke: var(--font-color);
+    opacity: 0.6;
+    /* MODIFIED: Corrected transition for smooth spin*/
+    transition: transform 0.3s ease-out, opacity 0.2s ease;
+}
+.module-collapse-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+.module-collapse-button:hover svg {
+    opacity: 1;
+}
+
+/* Module Content Wrapper */
+.module-content {
+    flex-grow: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; 
+    /* NEW: Animation properties for collapse*/
+    max-height: 100vh; /* (A large value) */
+    opacity: 1;
+    transition: max-height 0.3s ease-out, opacity 0.2s ease-in-out 0.1s, min-height 0.3s ease-out;
+}
+
+/*=====  End of Global Component: Module Window  ======*/
+
+
+/*=============================================
+=            Global Utility Classes           =
+=============================================*/
+
+/* * MODIFIED: Layout Utility
+ * Hides a panel slot or resizer completely.
+ * Now includes animation logic for collapse.
+*/
+.is-hidden {
+    display: none !important;
+}
+
+/* NEW: Rule to make a .resizer-horizontal disappear*/
+.resizer-horizontal.is-hidden {
+    height: 0;
+    max-height: 0;
+    margin: 0;
+    opacity: 0;
+}
+
+/* * NEW: Rule for the *sibling* to expand
+ * This rule is *correct*. It removes the basis and
+ * lets flex-grow (which is already 1) do the work.
+*/
+.panel-slot.is-expanded-fill {
+    flex-basis: 100%;
+}
+
+/* * MODIFIED: Collapse logic now targets the *slot*
+ * This will collapse the *slot* down to the height
+ * of its title bar.
+*/
+.panel-slot.is-panel-collapsed {
+    /* MODIFIED: This is the key: stop growing, */
+    /* and be only as tall as your content (the title bar) */
+    flex-grow: 0;
+    flex-basis: auto;
+}
+
+/* When the slot is collapsed, hide its content*/
+.is-panel-collapsed .module-content {
+    max-height: 0;
+    min-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in, min-height 0.3s ease-in, opacity 0.2s ease-out;
+}
+
+/* When the slot is collapsed, rotate the button's SVG*/
+.is-panel-collapsed .module-collapse-button svg {
+    /* MODIFIED: Corrected transform for pure rotation*/
+    transform: rotate(180deg);
+}
+/*=====  End of Global Utility Classes  ======*/

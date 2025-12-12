@@ -1,0 +1,325 @@
+/**
+ * ExcelViewer - Professional Styling
+ * Dark theme matching DocuFlow aesthetic
+ */
+
+/* ==================== CONTAINER ==================== */
+.excel-viewer {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    background: var(--bg-primary, #1e1e1e);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 13px;
+    color: var(--text-primary, #e0e0e0);
+    overflow: hidden;
+}
+
+.ev-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+
+/* ==================== FORMULA BAR ==================== */
+.ev-formula-bar {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+    background: var(--bg-tertiary, #2d2d2d);
+    border-bottom: 1px solid var(--border-color, #3c3c3c);
+    height: 28px;
+    flex-shrink: 0;
+}
+
+.ev-cell-ref {
+    width: 80px;
+    padding: 0 12px;
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--text-secondary, #aaa);
+    background: var(--bg-secondary, #252526);
+    height: 100%;
+    display: flex;
+    align-items: center;
+    border-right: 1px solid var(--border-color, #3c3c3c);
+    user-select: text;
+}
+
+.ev-cell-content {
+    flex: 1;
+    padding: 0 12px;
+    font-size: 13px;
+    color: var(--text-primary, #e0e0e0);
+    background: var(--bg-secondary, #252526);
+    height: 100%;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    user-select: text;
+    cursor: text;
+}
+
+/* ==================== GRID CONTAINER ==================== */
+.ev-grid-container {
+    flex: 1;
+    overflow: auto;
+    position: relative;
+}
+
+/* ==================== TABLE ==================== */
+.ev-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: auto;
+    min-width: 100%;
+}
+
+/* ==================== HEADER CELLS ==================== */
+.ev-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+/* Letter row (A, B, C...) - Column headers */
+.ev-letter-row th {
+    background: var(--bg-tertiary, #2d2d2d);
+    border-right: 1px solid var(--border-color, #3c3c3c);
+    border-bottom: 1px solid var(--border-subtle, #3c3c3c);
+    padding: 2px 8px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 11px;
+    height: 18px;
+    color: var(--text-secondary, #888);
+    user-select: none;
+}
+
+/* ==================== NAMES ROW (Column Names) - IN THEAD ==================== */
+.ev-names-row th {
+    background: #217346;
+    /* Excel-like vivid green */
+    border-right: 1px solid #1a5c38;
+    border-bottom: 2px solid #1a5c38;
+    padding: 4px 8px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    box-sizing: border-box;
+    min-width: 30px;
+    max-width: 500px;
+}
+
+/* First header cell - rounded top-left */
+.ev-names-row th.ev-name-cell:first-of-type {
+    border-top-left-radius: 4px;
+}
+
+/* Last header cell - rounded top-right */
+.ev-names-row th.ev-name-cell:last-of-type {
+    border-top-right-radius: 4px;
+}
+
+/* Row number in names row - identical to ev-row-num */
+.ev-row-num-header {
+    background: var(--bg-secondary, #252526) !important;
+    border-right: 1px solid var(--border-color, #3c3c3c) !important;
+    text-align: center !important;
+    font-weight: 500 !important;
+    font-size: 11px !important;
+    color: var(--text-secondary, #666) !important;
+    padding: 2px 0 !important;
+    min-width: unset !important;
+    max-width: unset !important;
+}
+
+/* Corner cell - sticky both ways */
+.ev-corner {
+    position: sticky;
+    left: 0;
+    z-index: 20;
+    background: var(--bg-tertiary, #2d2d2d) !important;
+    border-right: 1px solid var(--border-color, #3c3c3c) !important;
+}
+
+/* ==================== BODY CELLS ==================== */
+.ev-table tbody tr {
+    height: 26px;
+}
+
+.ev-table tbody tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.015);
+}
+
+/* Row hover - subtle green */
+.ev-table tbody tr:hover {
+    background: #1e2e28;
+    /* Solid dark green */
+}
+
+.ev-table tbody tr:hover .ev-row-num {
+    background: #243830;
+    /* Solid green - slightly lighter */
+    color: var(--text-primary, #e0e0e0);
+}
+
+/* Active row (has selected cell) */
+.ev-table tbody tr.ev-row-active {
+    background: #213229;
+    /* Solid */
+}
+
+/* Selected row (row number clicked) */
+.ev-table tbody tr.ev-row-selected {
+    background: #243830;
+    /* Solid */
+}
+
+.ev-table tbody tr.ev-row-selected td {
+    background: #1e2e28;
+    /* Solid */
+}
+
+/* Data cells - UPDATED min/max width */
+.ev-table td {
+    border-right: 1px solid var(--border-subtle, #2a2a2a);
+    border-bottom: 1px solid var(--border-subtle, #2a2a2a);
+    padding: 4px 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    box-sizing: border-box;
+    min-width: 30px;
+    max-width: 500px;
+}
+
+/* Row number cells */
+.ev-row-num {
+    position: sticky;
+    left: 0;
+    z-index: 5;
+    padding: 2px 0;
+    text-align: center;
+    font-weight: 500;
+    font-size: 11px;
+    color: var(--text-secondary, #666);
+    background: var(--bg-secondary, #252526);
+    border-right: 1px solid var(--border-color, #3c3c3c) !important;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Row number hover - SAME as row hover */
+.ev-row-num:hover {
+    background: #1e2e28;
+    /* Solid */
+}
+
+/* Row number active - SAME as row selected */
+.ev-row-num-active {
+    background: #243830 !important;
+    /* Solid */
+    color: var(--text-primary, #e0e0e0) !important;
+}
+
+/* ==================== SELECTED CELL ==================== */
+.ev-cell.ev-selected {
+    outline: 1px solid var(--gradient-color-top-left, #00c878);
+    outline-offset: -1px;
+    background: rgba(0, 200, 120, 0.1);
+    z-index: 1;
+    position: relative;
+}
+
+/* ==================== EMPTY STATE ==================== */
+.ev-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted, #666);
+    font-style: italic;
+}
+
+/* ==================== SHEET TABS ==================== */
+.ev-tabs-bar {
+    display: flex;
+    gap: 2px;
+    padding: 4px 8px 0 8px;
+    background: var(--bg-tertiary, #2d2d2d);
+    border-top: 1px solid var(--border-color, #3c3c3c);
+    overflow-x: auto;
+    flex-shrink: 0;
+}
+
+.ev-tab {
+    padding: 6px 16px;
+    border: none;
+    background: var(--bg-secondary, #252526);
+    color: var(--text-secondary, #aaa);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 4px 4px 0 0;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+    position: relative;
+}
+
+.ev-tab:hover {
+    background: var(--bg-hover, #3a3a3a);
+    color: var(--text-primary, #e0e0e0);
+}
+
+/* Active tab - keep background, add green underline */
+.ev-tab-active {
+    background: var(--bg-hover, #3a3a3a);
+    color: var(--text-primary, #fff);
+}
+
+/* Green underline indicator for active tab */
+.ev-tab-active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--gradient-color-top-left, #00c878);
+}
+
+.ev-tab-active:hover {
+    background: var(--bg-hover, #444);
+}
+
+/* ==================== SCROLLBAR STYLING - Paneton style ==================== */
+.ev-grid-container::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.ev-grid-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.ev-grid-container::-webkit-scrollbar-thumb {
+    background: rgba(152, 152, 152, 0.4);
+    border-radius: 4px;
+}
+
+.ev-grid-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(152, 152, 152, 0.7);
+}
+
+.ev-grid-container::-webkit-scrollbar-corner {
+    background: transparent;
+}

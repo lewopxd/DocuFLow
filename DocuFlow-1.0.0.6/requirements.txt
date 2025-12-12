@@ -23,7 +23,7 @@ PyMuPDF==1.26.6
 
 docx2pdf==0.1.8
 PyPDF2==3.0.1
-
+psutil==6.1.0
 
 # Utilidades adicionales (agregar despues segun necesidad)
 # pandas==2.2.0          # Para manipulación de datos

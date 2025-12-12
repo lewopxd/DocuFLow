@@ -1,0 +1,764 @@
+/*
+ * Project: DocuFlow
+ * File:  modules/templates-panel/templates-panel.css
+ * Created: 2025-11-04
+ * Author: @lewopxd
+ *
+ * Description:
+ * Stylesheet for the Templates Panel Module.
+ * Contains component styles (tabs, placeholders) and the "Blue" theme.
+ */
+
+/*=============================================
+=            Component: Tabs                  =
+=============================================*/
+.tab {
+    background-color: var(--tab-bg);
+    border: 1px solid var(--border-color);
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    height: var(--tab-height);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    margin: 0 0.5px;
+    position: relative;
+    bottom: -1px;
+
+    /* Define flex behavior explicitly */
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: 180px;
+
+    display: grid;
+    /* Columns: [Icon] [Name Wrapper (flexible)] [Close] */
+    grid-template-columns: auto 1fr auto;
+    gap: 4px;
+    align-items: center;
+    padding: 0 4px 0 8px;
+    /* Asymmetrical L/R padding for icon */
+
+    /* Enable Container Queries on this element. */
+    container-type: inline-size;
+
+    font-size: 13px;
+    min-width: 50px;
+    /* Minimum width (for 2 icons) */
+    max-width: 200px;
+    box-sizing: border-box;
+}
+
+/* --- Tab Grid Elements --- */
+.tab-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+}
+
+/* Styles for file type SVGs */
+.tab-icon svg {
+    width: 100%;
+    height: 100%;
+    stroke: none;
+    /* Ensure no border */
+}
+
+/* Icon coloring for this module's tabs */
+#right-column .tab-icon svg {
+    fill: var(--font-color);
+    /* Use fill for panel color */
+}
+
+
+/* --- Wrapper for Name + Extension --- */
+.tab-name-wrapper {
+    display: flex;
+    /* Place name and extension inline */
+    min-width: 0;
+    /* Essential for flexbox to calculate overflow */
+    overflow: hidden;
+    /* Hide general overflow of the wrapper */
+}
+
+.tab-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* Shrink logic (ellipsis) is applied here */
+}
+
+.tab-ext {
+    white-space: nowrap;
+    /* Identical style to the label */
+}
+
+.tab-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    padding: 1px;
+    margin-left: 2px;
+}
+
+.tab-close svg {
+    width: 14px;
+    height: 14px;
+    stroke: var(--font-color);
+    opacity: 0.7;
+    transition: opacity 0.2s ease, background-color 0.2s ease;
+}
+
+.tab-close:hover svg {
+    opacity: 1;
+}
+
+.tab-close:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* --- Responsive Tab Layout (Container Query) --- */
+@container (max-width: 100px) {
+    .tab {
+        /* Change grid to 2 columns */
+        grid-template-columns: 1fr auto;
+        /* [Name-Wrapper] [Close] */
+        padding: 0 4px;
+        /* Symmetrical L/R padding */
+    }
+
+    .tab-icon {
+        /* Hide the icon */
+        display: none;
+    }
+}
+
+
+.tab:hover {
+    background-color: rgba(55, 55, 56, 0.8);
+}
+
+.tab.active {
+    margin: 0 4px;
+    /* Padding adjusted for grid */
+    padding-left: 11px;
+    padding-right: 7px;
+    border-width: 1px;
+    border-style: solid;
+    color: #ffffff;
+}
+
+/* Padding for active tab when it is also compact */
+@container (max-width: 100px) {
+    .tab.active {
+        padding: 0 7px;
+        /* Symmetrical L/R padding */
+    }
+}
+
+/* When active, the close button is more visible */
+.tab.active .tab-close svg {
+    opacity: 0.9;
+}
+
+/* --- Toolbar (shared by tabs) --- */
+/* This is the container for tabs, defined in the module HTML */
+.panel-toolbar {
+    padding: 10px 20px 0 20px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.toolbar-tabs {
+    display: flex;
+    justify-content: flex-start;
+}
+
+/*=====  End of Component: Tabs  ======*/
+
+/*=============================================
+=            Templates Panel Theme (Blue)     =
+=============================================*/
+/* * These rules apply the "Blue" theme to the toolbars and
+ * tabs loaded *inside* the #right-column.
+*/
+#right-column .panel-toolbar {
+    border-bottom: 1px solid var(--gradient-color-bottom-right);
+}
+
+#right-column .tab {
+    border-bottom-color: var(--gradient-color-bottom-right);
+}
+
+#right-column .tab.active {
+    background-color: #00c9ff22;
+    border-top-color: var(--gradient-color-bottom-right);
+    border-left-color: var(--gradient-color-bottom-right);
+    border-right-color: var(--gradient-color-bottom-right);
+    border-bottom-color: var(--panel-background);
+}
+
+/*=====  End of Templates Panel Theme (Blue)  ======*/
+
+
+/*=============================================
+=            Panel Content (Tabs)             =
+=============================================*/
+/* This is the container for .tab-content, defined in module HTML */
+.panel-content {
+    padding: 0;
+    flex-grow: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Animation for new tabs */
+@keyframes contentFadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* * MODIFIED: "box-inset" layout is removed.
+ * .tab-content now fills its parent .panel-slot 100%.
+*/
+.tab-content {
+    /* MODIFIED: Removed calc() and margin */
+    width: 100%;
+    height: 100%;
+    margin: 0;
+
+    display: none;
+    overflow: hidden;
+    padding: 0;
+}
+
+.tab-content.active {
+    display: block;
+    animation: contentFadeIn 0.4s ease-out forwards;
+
+    /* MODIFIED: Removed border and border-radius */
+    border: none;
+    border-radius: 0;
+}
+
+/*=====  End of Panel Content (Tabs)  ======*/
+
+
+/*=============================================
+=            Placeholders (Empty Panel)       =
+=============================================*/
+/* * This is the placeholder defined in the module's HTML.
+*/
+.placeholder {
+    color: rgba(255, 255, 255, 0.6);
+    /* MODIFIED: Removed padding */
+    padding: 0;
+    height: 100%;
+    box-sizing: border-box;
+    overflow: auto;
+
+    /* MODIFIED: Add padding to the placeholder *itself*
+     * to center the frame, since .tab-content no longer has margin.
+    */
+    padding: 20px;
+}
+
+.placeholder-frame {
+    border: 1px dashed var(--dashed-border-color);
+    border-radius: 6px;
+    padding: 20px;
+    box-sizing: border-box;
+
+    width: 100%;
+    height: 100%;
+}
+
+.placeholder h2 {
+    margin-top: 0;
+    color: #fff;
+    font-weight: 500;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+/*=====  End of Placeholders (Empty Panel)  ======*/
+
+/*=============================================
+=            Component: Action Tab            =
+=============================================*/
+/*
+ * This targets the #load-template-button,
+ * which has class .tab but functions as an action button.
+*/
+#load-template-button {
+    /* Override .tab flex/sizing */
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
+    min-width: 32px;
+    max-width: 32px;
+    padding: 0;
+    margin-left: 2px;
+    /* Spacing from other tabs */
+
+    /* Override .tab grid to center icon */
+    display: grid;
+    grid-template-columns: 1fr;
+    place-items: center;
+
+    /* Make transparent by default */
+    background-color: transparent;
+    border-color: transparent;
+}
+
+/* Theme-specific border overrides for transparent state */
+#right-column #load-template-button {
+    border-bottom-color: transparent;
+}
+
+/* Style the injected SVG */
+#load-template-button svg {
+    width: 16px;
+    height: 16px;
+    stroke: var(--font-color);
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+/* Hover state for SVG */
+#load-template-button:hover svg {
+    opacity: 1;
+}
+
+/* Hover state to show tab appearance */
+#load-template-button:hover {
+    background-color: var(--tab-bg);
+    border-color: var(--border-color);
+}
+
+#right-column #load-template-button:hover {
+    border-bottom-color: var(--gradient-color-bottom-right);
+}
+
+
+/* Override .tab.active state */
+#load-template-button.active {
+    /* Keep transparent even when "active" (clicked) */
+    background-color: transparent;
+    color: var(--font-color);
+    margin: 0 0.5px;
+    /* Reset from .tab.active */
+    padding: 0;
+    /* Reset from .tab.active */
+
+    /* Reset active borders to look inactive */
+    border-color: transparent;
+}
+
+/* Ensure bottom border color is correct on active override */
+#right-column #load-template-button.active {
+    border-bottom-color: transparent;
+}
+
+/* Remove query-based padding overrides */
+@container (max-width: 100px) {
+    #load-template-button.active {
+        padding: 0;
+    }
+
+    /* Fix for compact action tab grid */
+    #load-template-button {
+        grid-template-columns: 1fr;
+        padding: 0;
+    }
+}
+
+/*=====  End of Component: Action Tab  ======*/
+
+/*=============================================
+=            Template Panel Path Bar Styles   =
+=============================================*/
+/* Path input focus state - use blue accent */
+#right-column .status-bar__path-input:focus {
+    outline: none;
+    border-color: var(--gradient-color-bottom-right);
+    box-shadow: 0 0 0 1px var(--gradient-color-bottom-right);
+}
+
+/* Text selection color - use blue accent */
+#right-column .status-bar__path-input::selection {
+    background-color: rgba(0, 201, 255, 0.3);
+    color: #ffffff;
+}
+
+/* Content area styling */
+.template-content-area {
+    flex: 1;
+    overflow: auto;
+    padding: 10px;
+}
+
+/*=====  End of Template Panel Path Bar  ======*/
+
+/*=============================================
+=            Mapping Grid System              =
+=============================================*/
+
+/* Main container - split layout */
+.mapping-grid {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Left panel - mapping cards with CSS Grid like Excel */
+.mapping-left-panel {
+    flex: 4;
+    display: grid;
+    /* 3 columns: Column Card | Arrow | Placeholder Card
+       Each column auto-sizes to its widest content */
+    grid-template-columns: auto auto auto;
+    gap: 6px 8px;
+    align-content: start;
+    justify-content: center;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+/* Right panel - placeholder summary (20%) */
+.mapping-right-panel {
+    flex: 1;
+    min-width: 120px;
+    max-width: 180px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 8px;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.15);
+    border-left: 1px solid var(--border-color);
+}
+
+/* Type separator in right panel */
+.placeholder-type-separator {
+    height: 1px;
+    background: linear-gradient(90deg, transparent 10%, rgba(255, 255, 255, 0.15) 50%, transparent 90%);
+    margin: 6px 0;
+}
+
+/* Placeholder summary item in right panel */
+.placeholder-summary-item {
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 11px;
+    color: #aaa;
+    padding: 2px 6px;
+    border-radius: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.placeholder-summary-item.type-text {
+    color: var(--gradient-color-bottom-right, #00c9ff);
+}
+
+.placeholder-summary-item.type-image {
+    color: #b388ff;
+}
+
+.placeholder-summary-item .tag-pattern {
+    font-weight: 500;
+}
+
+.placeholder-summary-item .tag-count {
+    opacity: 0.7;
+    font-size: 10px;
+}
+
+/* Type separator spans full grid width */
+.mapping-type-separator {
+    grid-column: 1 / -1;
+    /* Span all columns */
+    height: 1px;
+    background: linear-gradient(90deg, transparent 5%, rgba(255, 255, 255, 0.12) 50%, transparent 95%);
+    margin: 4px 0;
+}
+
+/* Arrow between cards (middle column in grid) */
+.mapping-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.3);
+    flex-shrink: 0;
+}
+
+.mapping-arrow svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Base card style - auto-size to content */
+.mapping-card {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+    background: var(--tab-bg);
+    /* No width constraints - let content determine size */
+    white-space: nowrap;
+    cursor: default;
+    transition: all 0.2s ease;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 12px;
+}
+
+/* Horizontal separator between type groups in left panel */
+.mapping-type-separator {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 5%, rgba(255, 255, 255, 0.12) 50%, transparent 95%);
+    margin: 8px 0;
+}
+
+/* Input inside card - size to its content */
+.mapping-card-input-readonly {
+    width: auto;
+    min-width: 30px;
+    max-width: 180px;
+    border: none;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    padding: 0;
+    margin: 0;
+    outline: none;
+    cursor: inherit;
+    /* Size based on content via field-sizing */
+    field-sizing: content;
+}
+
+.mapping-card-input-readonly:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+/* Column card (left - editable) - GREEN theme */
+.mapping-card-column {
+    cursor: pointer;
+    border-color: rgba(0, 200, 120, 0.4);
+    border-style: dashed;
+}
+
+.mapping-card-column:hover {
+    background: rgba(0, 200, 120, 0.08);
+}
+
+.mapping-card-column.matched {
+    border-color: rgba(0, 200, 120, 0.8);
+    border-style: solid;
+    background: rgba(0, 200, 120, 0.12);
+}
+
+.mapping-card-column.unmatched .card-placeholder-text {
+    color: #888;
+    font-style: italic;
+    font-size: 11px;
+}
+
+.mapping-card-column.drag-over {
+    border-color: rgba(0, 200, 120, 1);
+    background: rgba(0, 200, 120, 0.2);
+    border-style: solid;
+    box-shadow: 0 0 0 2px rgba(0, 200, 120, 0.3);
+}
+
+/* Placeholder card - TEXT type - BLUE theme */
+.mapping-card-placeholder {
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 12px;
+    user-select: text;
+    cursor: text;
+}
+
+.mapping-card-placeholder.type-text {
+    border-color: var(--gradient-color-bottom-right, #00c9ff);
+    background: rgba(0, 201, 255, 0.08);
+    color: var(--gradient-color-bottom-right, #00c9ff);
+}
+
+/* Placeholder card - IMAGE type - PURPLE theme */
+.mapping-card-placeholder.type-image {
+    border-color: #b388ff;
+    background: rgba(179, 136, 255, 0.08);
+    color: #b388ff;
+}
+
+/* Placeholder card - OTHER types */
+.mapping-card-placeholder.type-other {
+    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.03);
+    color: #ccc;
+}
+
+
+
+/* Input for editing column card */
+.mapping-card-input {
+    width: 100%;
+    padding: 3px 6px;
+    border: 1px solid rgba(0, 200, 120, 0.8);
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.3);
+    color: #fff;
+    font-size: 12px;
+    outline: none;
+}
+
+.mapping-card-input:focus {
+    box-shadow: 0 0 0 2px rgba(0, 200, 120, 0.3);
+}
+
+/* Empty state */
+.mapping-empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    color: #888;
+    padding: 40px;
+    text-align: center;
+}
+
+.mapping-empty p {
+    margin: 0;
+    font-size: 14px;
+}
+
+/* Error state */
+.mapping-error {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    color: #ff6b6b;
+    padding: 40px;
+    text-align: center;
+}
+
+.mapping-error p {
+    margin: 0;
+    font-size: 14px;
+}
+
+/*=====  End of Mapping Grid System  ======*/
+
+/*=============================================
+=            Template Meta Bar                =
+=============================================*/
+
+.template-meta-bar {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-end;
+    align-items: center;
+    min-height: 20px;
+    padding: 4px 5px;
+    border-top: 1px solid var(--border-color);
+    background-color: var(--meta-bg-crystal, rgba(0, 0, 0, 0.2));
+    font-size: 12px;
+    color: #888;
+}
+
+.template-meta-bar .meta-item {
+    display: flex;
+    align-items: center;
+    padding: 0 5px;
+    white-space: nowrap;
+}
+
+.template-meta-bar .meta-highlight {
+    color: var(--gradient-color-bottom-right);
+    font-weight: 500;
+}
+
+.template-meta-bar .meta-error {
+    color: #ff6b6b;
+}
+
+/*=====  End of Template Meta Bar  ======*/
+
+/*=============================================
+=            Lock Icon for Column Cards       =
+=============================================*/
+
+/* Lock icon container in column card */
+.mapping-card-lock {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    margin-left: auto;
+    padding: 2px;
+    border-radius: 3px;
+    cursor: pointer;
+    color: #888;
+    /* Gray when unlocked */
+    opacity: 0.5;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.mapping-card-lock:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.mapping-card-lock svg {
+    width: 12px;
+    height: 12px;
+    stroke: currentColor;
+    fill: none;
+}
+
+/* Locked state - green accent */
+.mapping-card-column.locked .mapping-card-lock {
+    opacity: 1;
+    color: rgba(0, 200, 120, 1);
+    /* Green accent */
+}
+
+.mapping-card-column.locked {
+    border-color: rgba(0, 200, 120, 0.8);
+    cursor: not-allowed;
+}
+
+.mapping-card-column.locked:hover {
+    background: rgba(0, 200, 120, 0.08);
+}
+
+/* Locked card: no editing allowed */
+.mapping-card-column.locked .mapping-card-input-readonly {
+    cursor: not-allowed;
+}
+
+/*=====  End of Lock Icon  ======*/

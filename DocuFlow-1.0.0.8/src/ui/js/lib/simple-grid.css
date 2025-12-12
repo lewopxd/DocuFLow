@@ -1,0 +1,96 @@
+/* SimpleGrid Theme - Matches Paneton/App Theme */
+
+.simple-grid-container {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    color: var(--font-color, #ccc);
+    font-size: 13px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Header */
+.sg-header-container {
+    overflow: hidden;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--border-color, #444);
+    background-color: var(--meta-bg-crystal, rgba(0, 0, 0, 0.2));
+}
+
+.sg-header-row {
+    display: flex;
+    height: 32px;
+    /* Matches JS default */
+}
+
+.sg-header-cell {
+    padding: 0 8px;
+    display: flex;
+    align-items: center;
+    border-right: 1px solid var(--border-color, #444);
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    box-sizing: border-box;
+    user-select: none;
+    opacity: 0.8;
+}
+
+.sg-corner-cell {
+    background-color: rgba(0, 0, 0, 0.2);
+    /* Slightly darker */
+    justify-content: center;
+    color: #888;
+    border-right: 1px solid var(--border-color, #555);
+}
+
+/* Body */
+.sg-viewport {
+    flex: 1;
+    overflow: auto;
+    position: relative;
+    /* Custom Scrollbar Styles usually inherited or global */
+}
+
+.sg-sizer {
+    position: relative;
+    /* Size set by JS */
+}
+
+/* Rows & Cells */
+.sg-row {
+    position: absolute;
+    left: 0;
+    right: 0;
+    display: flex;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    /* Very subtle separator */
+    box-sizing: border-box;
+    transition: background-color 0.1s;
+}
+
+.sg-row:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.sg-cell {
+    padding: 0 8px;
+    display: flex;
+    align-items: center;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-sizing: border-box;
+}
+
+.sg-row-number {
+    background-color: rgba(0, 0, 0, 0.15);
+    /* Distinct from data cells */
+    justify-content: center;
+    color: #777;
+    font-size: 11px;
+    border-right: 1px solid var(--border-color, #444);
+}

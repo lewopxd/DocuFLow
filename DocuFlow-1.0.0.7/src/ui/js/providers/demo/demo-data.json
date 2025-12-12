@@ -1,0 +1,197 @@
+{
+    "providerData": {
+      "paths": [
+        "C:/Users/DemoUser/Documents/Proyectos/"
+      ],
+      "sheets": [
+        "Sales_Report_Q3_2025.xlsx",
+        "Employee_Data_Master.csv",
+        "Financial_Projections_v2.xls",
+        "Inventory_Levels_Oct.xlsx"
+      ],
+      "docs": [
+        "Master_Service_Agreement_v3.docx",
+        "Meeting_Minutes_Oct_28.doc",
+        "Template_Carta_Oferta.docx",
+        "Project_Scope_Final.docx"
+      ],
+      "fileStructures": {
+        "Sales_Report_Q3_2025.xlsx": {
+          "metadata": {
+            "fullPath": "C:/Users/DemoUser/Documents/Proyectos/Sales_Report_Q3_2025.xlsx",
+            "fileName": "Sales_Report_Q3_2025.xlsx",
+            "fileSizeKB": 215,
+            "sheetCount": 4
+          },
+          "sheets": [
+            {
+              "sheetName": "presencial",
+              "tables": [
+                {
+                  "tableName": "Asistencia_Presencial",
+                  "isNamedTable": true,
+                  "range": "A2:D102",
+                  "rowCount": 100,
+                  "columns": [
+                    "ID_Empleado",
+                    "Nombre",
+                    "Departamento",
+                    "Firma"
+                  ]
+                }
+              ]
+            },
+            {
+              "sheetName": "virtual",
+              "tables": [
+                {
+                  "tableName": "Log_Virtual",
+                  "isNamedTable": true,
+                  "range": "B5:F205",
+                  "rowCount": 200,
+                  "columns": [
+                    "Email",
+                    "Curso",
+                    "Fecha_Acceso",
+                    "Tiempo_Min",
+                    "Completado"
+                  ]
+                }
+              ]
+            },
+            {
+              "sheetName": "guias",
+              "tables": [
+                {
+                  "tableName": "UNAMED_TABLE",
+                  "isNamedTable": false,
+                  "range": "A1:C51",
+                  "rowCount": 50,
+                  "columns": [
+                    "ID_Guia",
+                    "Titulo_Documento",
+                    "URL_Enlace"
+                  ]
+                }
+              ]
+            },
+            {
+              "sheetName": "sin contacto",
+              "tables": [
+                {
+                  "tableName": "Materiales_Enviados",
+                  "isNamedTable": true,
+                  "range": "A3:D78",
+                  "rowCount": 75,
+                  "columns": [
+                    "ID_Empleado",
+                    "Kit_Enviado",
+                    "Fecha_Envio",
+                    "Tracking_ID"
+                  ]
+                },
+                {
+                  "tableName": "Costos_Envio",
+                  "isNamedTable": true,
+                  "range": "F3:H12",
+                  "rowCount": 9,
+                  "columns": [
+                    "Proveedor_Logistico",
+                    "Tarifa_Base",
+                    "Total_Envios"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "Employee_Data_Master.csv": {
+          "metadata": {
+            "fullPath": "C:/Users/DemoUser/Documents/Proyectos/Employee_Data_Master.csv",
+            "fileName": "Employee_Data_Master.csv",
+            "fileSizeKB": 85,
+            "sheetCount": 1
+          },
+          "sheets": [
+            {
+              "sheetName": "Employees",
+              "tables": [
+                {
+                  "tableName": "Employee_Data",
+                  "isNamedTable": true,
+                  "range": "A1:D86",
+                  "rowCount": 85,
+                  "columns": [
+                    "ID_Empleado",
+                    "FirstName",
+                    "LastName",
+                    "HireDate"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "Financial_Projections_v2.xls": {
+          "metadata": {
+            "fullPath": "C:/Users/DemoUser/Documents/Proyectos/Financial_Projections_v2.xls",
+            "fileName": "Financial_Projections_v2.xls",
+            "fileSizeKB": 42,
+            "sheetCount": 1
+          },
+          "sheets": [
+            {
+              "sheetName": "Projections",
+              "tables": [
+                {
+                  "tableName": "Financial_Model",
+                  "isNamedTable": true,
+                  "range": "A1:D37",
+                  "rowCount": 36,
+                  "columns": [
+                    "Month",
+                    "Revenue",
+                    "Cost",
+                    "Profit"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "Inventory_Levels_Oct.xlsx": {
+          "metadata": {
+            "fullPath": "C:/Users/DemoUser/Documents/Proyectos/Inventory_Levels_Oct.xlsx",
+            "fileName": "Inventory_Levels_Oct.xlsx",
+            "fileSizeKB": 123,
+            "sheetCount": 1
+          },
+          "sheets": [
+            {
+              "sheetName": "Inventory",
+              "tables": [
+                {
+                  "tableName": "UNAMED_TABLE",
+                  "isNamedTable": false,
+                  "range": "A1:D251",
+                  "rowCount": 250,
+                  "columns": [
+                    "SKU",
+                    "Description",
+                    "Warehouse",
+                    "Qty_In_Stock"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "uiData": {
+      "theme": "dark",
+      "language": "es",
+      "last_opened_sheet": [],
+      "last_opened_template": []
+    }
+}

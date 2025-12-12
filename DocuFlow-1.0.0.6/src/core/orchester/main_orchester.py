@@ -11,17 +11,6 @@ Description:
 Main orchestrator for complex, multi-step backend jobs.
 Combines core functions to perform bulk operations, such as
 reading from an Excel sheet and generating multiple Word documents.
-
-MODIFICADO (v2 - BUGFIX de Trazabilidad):
-- Añadida la lista 'failure_details_list' para registrar
-  correctamente los errores que solo se estaban contando
-  en 'failure_count' pero no se estaban reportando.
-
-MODIFICADO (v3 - BUGFIX Lógica de Filtros):
-- Se reemplazó el 'raise Exception' en la lógica de filtros
-  por un 'continue'. Lanzar una excepción por una fila
-  omitida era un anti-patrón que generaba falsos
-  positivos en el log de errores.
 """
 
 import os
@@ -155,9 +144,7 @@ def _transform_date_format(value: str, config: Dict[str, Any]) -> str:
     }
 
     if not value or not str(value).strip():
-        # Si el valor es vacío, no podemos formatear.
-        # Lanzar un error claro que será atrapado por el 'except' principal.
-        raise ValueError("El valor de fecha para 'date_format' está vacío o nulo.")
+        return ""
         
     input_format = config.get("input_format", None)
     output_template = config.get("output_template", "%d/%m/%Y")
@@ -209,9 +196,7 @@ def _transform_date_format(value: str, config: Dict[str, Any]) -> str:
         
     except Exception as e:
         print(f"⚠️ Error en date_format: {e}. Devolviendo valor original.")
-        # Propagar el error para que el 'except' principal lo atrape y lo
-        # registre en 'failure_details_list'.
-        raise e
+        return value_to_parse
 
 
 def _transform_number_format(value: str, config: Dict[str, Any]) -> str:
@@ -354,9 +339,6 @@ def apply_transforms(value: Any, transforms: List[Dict[str, Any]], debug: bool =
             print(f"❌ Error aplicando transformación '{transform_type}': {e}")
             print(f"   Configuración: {transform_config}")
             print(f"   Manteniendo valor anterior: '{current_value}'")
-            # Propagar el error para que sea atrapado por el 'except'
-            # principal y se registre en 'failure_details_list'.
-            raise e
     
     return current_value
 
@@ -600,47 +582,8 @@ def _build_output_path(
     """Construye la ruta completa de salida (carpeta + archivo)."""
     try:
         folder_path = _process_pattern_with_columns(folder_config, row_data, debug=debug)
+        filename = _process_pattern_with_columns(filename_config, row_data, debug=debug)
         
-        # --- [ INICIO: CORRECCIÓN LÓGICA ] ---
-        # El orquestador debe ser lo suficientemente inteligente como para
-        # fusionar las columnas de 'folder_config' y 'filename_config'
-        # para que el 'filename_pattern' pueda usar columnas (como NOMBRES)
-        # definidas en el 'folder_pattern'.
-        
-        # 1. Obtener transformaciones del folder_pattern
-        folder_cols_map = {}
-        for col_cfg in folder_config.get("columns", []):
-            folder_cols_map[col_cfg["name"]] = col_cfg.get("transforms", [])
-        
-        # 2. Obtener transformaciones del filename_pattern
-        filename_cols_list = filename_config.get("columns", [])
-        
-        # 3. Crear un config combinado SOLO para el nombre de archivo
-        combined_filename_config = {
-            "template": filename_config.get("template", "documento.docx"),
-            "columns": []
-        }
-        
-        # 4. Añadir columnas del filename_config (tienen prioridad)
-        filename_cols_names = set()
-        for col_cfg in filename_cols_list:
-            col_name = col_cfg.get("name")
-            if col_name:
-                filename_cols_names.add(col_name)
-                combined_filename_config["columns"].append(col_cfg)
-        
-        # 5. Añadir columnas FALTANTES del folder_config
-        for col_name, transforms in folder_cols_map.items():
-            if col_name not in filename_cols_names:
-                combined_filename_config["columns"].append({
-                    "name": col_name,
-                    "transforms": transforms
-                })
-        
-        # 6. Procesar el nombre de archivo usando el config combinado
-        filename = _process_pattern_with_columns(combined_filename_config, row_data, debug=debug)
-        # --- [ FIN: CORRECCIÓN LÓGICA ] ---
-
         if folder_path:
             folder_path = folder_path.replace("/", os.sep).replace("\\", os.sep)
             full_path = os.path.join(folder_path, filename)
@@ -651,10 +594,8 @@ def _build_output_path(
         
     except Exception as e:
         print(f"❌ Error construyendo ruta de salida: {e}")
-        # Si la construcción de la ruta falla (ej. un date_format en una
-        # columna del nombre de archivo), esta excepción será
-        # atrapada por el 'except' principal (línea 547).
-        raise e
+        row_index = row_data.get("row_index", "000")
+        return f"fallback_error_fila_{row_index}.docx"
 
 # -------------------------------------------------------------
 # -------------------[   MAIN ORCHESTRATOR   ]-----------------
@@ -704,7 +645,7 @@ def execute_bulk_document_job(config: Dict[str, Any]) -> Dict[str, Any]:
         if not row_data_list:
             print("ℹ️ No se encontraron filas en el rango especificado. Trabajo finalizado.")
             job_summary["status"] = "complete_success"
-            return {"job_summary": job_summary, "job_results": [], "failure_details": []} # Devolver lista vacía
+            return {"job_summary": job_summary, "job_results": []}
 
         print(f"✓ Paso 1 Exitoso: {len(row_data_list)} filas extraídas.")
         print(f"Paso 2: Iniciando generación de documentos...")
@@ -715,10 +656,6 @@ def execute_bulk_document_job(config: Dict[str, Any]) -> Dict[str, Any]:
         success_count = 0
         failure_count = 0
         skipped_count = 0
-        
-        # --- [ CAMBIO 1/5 ] ---
-        # Inicializar la lista de fallos que el script maestro espera
-        failure_details_list = []
         
         for row_data in row_data_list:
             row_index = row_data.get("row_index", "N/A")
@@ -737,22 +674,8 @@ def execute_bulk_document_job(config: Dict[str, Any]) -> Dict[str, Any]:
                         status = "skipped"
                         if debug:
                             print(f"   ⊘ Fila {row_index} omitida (no cumple filter_rules)")
-                        
-                        # --- [ INICIO: CORRECCIÓN v3 ] ---
-                        # Antes: raise Exception("La fila no cumplió con las 'filter_rules'.")
-                        # Esto era un anti-patrón. Ahora usamos 'continue'
-                        # para saltar limpiamente a la siguiente fila.
-                        # El 'except' ya no se activará para esto.
-                        job_results.append({
-                            "row_index": row_index,
-                            "input_data": row_data,
-                            "filename_generated": "N/A",
-                            "status": "skipped",
-                            "output_log": {"success": False, "error": "Fila omitida por filter_rules"}
-                        })
-                        continue 
-                        # --- [ FIN: CORRECCIÓN v3 ] ---
-
+                        raise Exception("La fila no cumplió con las 'filter_rules'.")
+                
                 if debug:
                     print(f"   Mapeando datos para placeholders Word...")
                 
@@ -775,7 +698,7 @@ def execute_bulk_document_job(config: Dict[str, Any]) -> Dict[str, Any]:
                 if full_target_path.exists() and not overwrite:
                     raise FileExistsError(f"El archivo '{relative_path}' ya existe y 'overwrite_existing' es False.")
 
-                # --- [ Lógica de Copia vs. Reemplazo ] ---
+                # --- [ INICIO DE MODIFICACIÓN: Lógica de Copia vs. Reemplazo ] ---
                 
                 # Caso 1: Diccionario de reemplazo VACÍO (Trabajo de Copia)
                 if not replacements_dict:
@@ -813,7 +736,7 @@ def execute_bulk_document_job(config: Dict[str, Any]) -> Dict[str, Any]:
                     
                     generation_log = generate_document_from_template(word_config)
                 
-                # --- [ FIN Lógica de Copia vs. Reemplazo ] ---
+                # --- [ FIN DE MODIFICACIÓN ] ---
 
                 
                 # Lógica de fallo estricta (funciona para ambos casos)
@@ -824,19 +747,7 @@ def execute_bulk_document_job(config: Dict[str, Any]) -> Dict[str, Any]:
                     status = "failure" 
                     failure_count += 1
                     generation_log["success"] = False
-                    error_msg = f"Archivo creado, pero faltaron placeholders: {not_found_tags}" # <-- El error
-                    generation_log["error"] = error_msg
-                    
-                    # --- [ CAMBIO 2/5 ] ---
-                    # Registrar el fallo de placeholder faltante
-                    folder_name = _process_pattern_with_columns(folder_pattern, row_data, debug=False)
-                    failure_details_list.append({
-                        "identifier": folder_name,
-                        "row_index": row_index,
-                        "error": error_msg
-                    })
-                    # --- [ FIN DE LA ADICIÓN ] ---
-
+                    generation_log["error"] = f"Archivo creado, pero faltaron placeholders: {not_found_tags}"
                     if debug:
                         print(f"   ✗ Fila {row_index} falló: Faltaron placeholders {not_found_tags}")
                 
@@ -849,29 +760,10 @@ def execute_bulk_document_job(config: Dict[str, Any]) -> Dict[str, Any]:
                 else:
                     failure_count += 1
                     status = "failure"
-
-                    # --- [ CAMBIO 3/5 ] ---
-                    # Registrar el fallo de generación
-                    error_msg = generation_log.get('error', 'Error desconocido en generate_document_from_template')
-                    folder_name = _process_pattern_with_columns(folder_pattern, row_data, debug=False)
-                    failure_details_list.append({
-                        "identifier": folder_name,
-                        "row_index": row_index,
-                        "error": error_msg
-                    })
-                    # --- [ FIN DE LA ADICIÓN ] ---
-
                     if debug:
                         print(f"   ✗ Fila {row_index} falló: {generation_log.get('error', 'Error desconocido')}")
                 
             except Exception as e:
-                # --- [ INICIO: CORRECCIÓN v3 ] ---
-                # Si el status es 'skipped', ya lo manejamos y no es un error.
-                # Solo procesar esto si es un error REAL ('pending').
-                if status == "skipped":
-                    continue # El 'job_results' para 'skipped' ya se añadió
-                # --- [ FIN: CORRECCIÓN v3 ] ---
-
                 if status == "pending":
                     failure_count += 1
                     status = "failure"
@@ -883,21 +775,6 @@ def execute_bulk_document_job(config: Dict[str, Any]) -> Dict[str, Any]:
                     "error": f"Error del Orquestador (Fila {row_index}): {error_message}",
                     "details": None
                 }
-
-                # --- [ CAMBIO 4/5 ] ---
-                # Registrar el fallo principal del orquestador (el que probablemente está ocurriendo)
-                try:
-                    folder_name = _process_pattern_with_columns(folder_pattern, row_data, debug=False)
-                except Exception:
-                    # Fallback si el error fue JUSTO al crear el nombre de la carpeta
-                    folder_name = f"ERROR_AL_OBTENER_NOMBRE (Fila {row_index})"
-                
-                failure_details_list.append({
-                    "identifier": folder_name,
-                    "row_index": row_index,
-                    "error": f"Error del Orquestador: {error_message}"
-                })
-                # --- [ FIN DE LA ADICIÓN ] ---
                 
                 if debug and status != "skipped":
                     print(f"   ✗ Error en Fila {row_index}: {error_message}")
@@ -932,8 +809,6 @@ def execute_bulk_document_job(config: Dict[str, Any]) -> Dict[str, Any]:
         job_summary["status"] = "total_failure"
         job_summary["error"] = str(e)
         
-    # --- [ CAMBIO 5/5 ] ---
-    # Devolver la lista de fallos junto con el resumen
-    return {"job_summary": job_summary, "job_results": job_results, "failure_details": failure_details_list}
+    return {"job_summary": job_summary, "job_results": job_results}
 
 # --------------------------------------> END [ MAIN ORCHESTRATOR ... ]

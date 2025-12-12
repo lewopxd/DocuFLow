@@ -1,0 +1,957 @@
+/*
+ * Project: DocuFlow
+ * File:  modules/data-panel/data-panel.css
+ * Created: 2025-11-04
+ * Author: @lewopxd
+ *
+ * Description:
+ * Stylesheet for the Data Panel Module.
+ * Contains all component styles (tabs, placeholders),
+ * theme styles (green), and layout styles (meta-bar, tree).
+ */
+
+/*=============================================
+=            Component: Tabs                  =
+=============================================*/
+.tab {
+    background-color: var(--tab-bg);
+    border: 1px solid var(--border-color);
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    height: var(--tab-height);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    margin: 0 0.5px;
+    position: relative;
+    bottom: -1px;
+
+    /* Define flex behavior explicitly */
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: 180px;
+
+    display: grid;
+    /* Columns: [Icon] [Name Wrapper (flexible)] [Close] */
+    grid-template-columns: auto 1fr auto;
+    gap: 4px;
+    align-items: center;
+    padding: 0 4px 0 8px;
+    /* Asymmetrical L/R padding for icon */
+
+    /* Enable Container Queries on this element. */
+    container-type: inline-size;
+
+    font-size: 13px;
+    min-width: 50px;
+    /* Minimum width (for 2 icons) */
+    max-width: 200px;
+    box-sizing: border-box;
+}
+
+/* --- Tab Grid Elements --- */
+.tab-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+}
+
+/* Styles for file type SVGs */
+.tab-icon svg {
+    width: 100%;
+    height: 100%;
+    stroke: none;
+    /* Ensure no border */
+}
+
+/* Icon coloring for this module's tabs */
+#left-column .tab-icon svg {
+    fill: var(--font-color);
+    /* Use fill for panel color */
+}
+
+
+/* --- Wrapper for Name + Extension --- */
+.tab-name-wrapper {
+    display: flex;
+    /* Place name and extension inline */
+    min-width: 0;
+    /* Essential for flexbox to calculate overflow */
+    overflow: hidden;
+    /* Hide general overflow of the wrapper */
+}
+
+.tab-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* Shrink logic (ellipsis) is applied here */
+}
+
+.tab-ext {
+    white-space: nowrap;
+    /* Identical style to the label */
+}
+
+.tab-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    padding: 1px;
+    margin-left: 2px;
+}
+
+.tab-close svg {
+    width: 14px;
+    height: 14px;
+    stroke: var(--font-color);
+    opacity: 0.7;
+    transition: opacity 0.2s ease, background-color 0.2s ease;
+}
+
+.tab-close:hover svg {
+    opacity: 1;
+}
+
+.tab-close:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* --- Responsive Tab Layout (Container Query) --- */
+@container (max-width: 100px) {
+    .tab {
+        /* Change grid to 2 columns */
+        grid-template-columns: 1fr auto;
+        /* [Name-Wrapper] [Close] */
+        padding: 0 4px;
+        /* Symmetrical L/R padding */
+    }
+
+    .tab-icon {
+        /* Hide the icon */
+        display: none;
+    }
+}
+
+
+.tab:hover {
+    background-color: rgba(55, 55, 56, 0.8);
+}
+
+.tab.active {
+    margin: 0 4px;
+    /* Padding adjusted for grid */
+    padding-left: 11px;
+    padding-right: 7px;
+    border-width: 1px;
+    border-style: solid;
+    color: #ffffff;
+}
+
+/* Padding for active tab when it is also compact */
+@container (max-width: 100px) {
+    .tab.active {
+        padding: 0 7px;
+        /* Symmetrical L/R padding */
+    }
+}
+
+/* When active, the close button is more visible */
+.tab.active .tab-close svg {
+    opacity: 0.9;
+}
+
+/* --- Toolbar (shared by tabs) --- */
+/* This is the container for tabs, defined in the module HTML */
+.panel-toolbar {
+    /* MODIFIED: Ultra-thin padding */
+    padding: 2px 10px 0 10px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.toolbar-tabs {
+    display: flex;
+    justify-content: flex-start;
+}
+
+/*=====  End of Component: Tabs  ======*/
+
+/*=============================================
+=            Data Panel Theme (Green)         =
+=============================================*/
+/* * These rules apply the "Green" theme to the toolbars and
+ * tabs loaded *inside* the #left-column.
+*/
+#left-column .panel-toolbar {
+    border-bottom: 1px solid var(--gradient-color-top-left);
+}
+
+#left-column .tab {
+    border-bottom-color: var(--gradient-color-top-left);
+}
+
+#left-column .tab.active {
+    background-color: #00ff9922;
+    border-top-color: var(--gradient-color-top-left);
+    border-left-color: var(--gradient-color-top-left);
+    border-right-color: var(--gradient-color-top-left);
+    border-bottom-color: var(--panel-background);
+}
+
+/*=====  End of Data Panel Theme (Green)  ======*/
+
+
+/*=============================================
+=            Panel Content (Tabs)             =
+=============================================*/
+/* This is the container for .tab-content, defined in module HTML */
+.panel-content {
+    padding: 0;
+    flex-grow: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Animation for new tabs */
+@keyframes contentFadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* * MODIFIED: "box-inset" layout is removed.
+ * .tab-content now fills its parent .panel-slot 100%.
+*/
+.tab-content {
+    /* MODIFIED: Removed calc() and margin */
+    width: 100%;
+    height: 100%;
+    margin: 0;
+
+    display: none;
+    overflow: hidden;
+    padding: 0;
+}
+
+.tab-content.active {
+    display: block;
+    animation: contentFadeIn 0.4s ease-out forwards;
+
+    /* MODIFIED: Removed border and border-radius */
+    border: none;
+    border-radius: 0;
+}
+
+/*=====  End of Panel Content (Tabs)  ======*/
+
+/*=============================================
+=            Data Panel Layout (Grid)         =
+=============================================*/
+/* * The layout wrapper (CHILD of .tab-content)
+ * This grid now defines the visible edges of the content.
+*/
+.tab-content-grid {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    /* Contain any internal overflow */
+}
+
+/* Row 1: File Path */
+.status-bar__path {
+    flex-shrink: 0;
+    /* MODIFIED: Tighter padding for the container */
+    padding: 4px 10px;
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--meta-bg-crystal);
+
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    /* Vertically center content */
+    gap: 8px;
+    /* Gap between input and controls */
+}
+
+/* * NEW: Style for the <input> path bar
+*/
+.status-bar__path-input {
+    flex-grow: 1;
+    /* Allow input to take available space */
+    width: 100%;
+    /* Default width */
+    min-width: 0;
+    /* Allow shrinking below content size */
+    box-sizing: border-box;
+    /* MODIFIED: More transparent background */
+    background-color: rgba(0, 0, 0, 0.1);
+    /* Rounded border */
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    /* Font styles */
+    color: var(--font-color);
+    font-family: 'Consolas', 'Monaco', monospace;
+    /* MODIFIED: Smaller font */
+    font-size: 11px;
+    /* MODIFIED: Lighter weight */
+    font-weight: 300;
+    padding: 4px 8px;
+    outline: none;
+    /* MODIFIED: Added opacity */
+    opacity: 0.7;
+    transition: border-color 0.2s ease, background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.status-bar__path-input:read-only {
+    /* MODIFIED: Use text cursor per request */
+    cursor: text;
+}
+
+.status-bar__path-input:focus {
+    /* MODIFIED: Use panel accent color for border */
+    border-color: var(--gradient-color-top-left);
+    /* MODIFIED: Darker focus background */
+    background-color: rgba(0, 0, 0, 0.2);
+    /* MODIFIED: Full opacity on focus */
+    opacity: 1;
+}
+
+/* * NEW: Style for text selection inside the path bar
+*/
+#left-column .status-bar__path-input::selection {
+    background-color: var(--gradient-color-top-left);
+    color: #000;
+}
+
+/* --- Controls Container (Reload, Toggle) --- */
+.status-bar__controls {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    align-items: center;
+}
+
+/* --- Icon Buttons --- */
+.icon-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    background-color: transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 4px;
+    box-sizing: border-box;
+}
+
+.icon-button svg {
+    width: 100%;
+    height: 100%;
+    stroke: var(--font-color);
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+}
+
+.icon-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.icon-button:hover svg {
+    opacity: 1;
+}
+
+.icon-button:active {
+    background-color: rba(255, 255, 255, 0.2);
+    transform: translateY(1px);
+}
+
+/* Row 2: Tree Wrapper */
+.tree-wrapper {
+    position: relative;
+    /* Container for the tree */
+    overflow: hidden;
+    /* Ensures tree does not overflow grid */
+    flex-grow: 1;
+    /* Tree takes all remaining space */
+    min-height: 0;
+    /* Critical for preventing overflow in flex */
+}
+
+
+/* Row 3: Metadata Bar */
+.meta-bar {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    /* Symmetric vertical padding for centered text */
+    padding: 4px 5px;
+    border-top: 1px solid var(--border-color);
+    background-color: var(--meta-bg-crystal);
+    overflow: hidden;
+}
+
+/*=============================================
+=            Spreadsheet Wrapper              =
+=============================================*/
+/* Wrapper for ExcelViewer - mirrors tree-wrapper layout */
+.spreadsheet-wrapper {
+    flex: 1;
+    overflow: auto;
+    position: relative;
+    min-height: 0;
+    /* Critical for flex children */
+    background-color: var(--pntn-tree-color-background, #1d1d1d);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Spinner inside spreadsheet wrapper needs to fill space */
+.spreadsheet-wrapper .loading-spinner-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/*=====  End of Spreadsheet Wrapper  ======*/
+
+/* Single Metadata Row */
+.meta-bar-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    /* MODIFIED: Re-introduced a clean gap */
+    gap: 8px;
+    /* MODIFIED: Justify to the right */
+    justify-content: flex-end;
+    align-items: center;
+    /* NEW: Give the row a minimal height so it's visible */
+    min-height: 20px;
+}
+
+/* * MODIFIED: Individual metadata box
+*/
+.meta-stat-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+
+    /* MODIFIED: Tighter padding */
+    padding: 0 5px;
+
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+/* * MODIFIED: Removed the entire neumorphic separator rule
+ * .meta-stat-box + .meta-stat-box { ... }
+*/
+
+
+.meta-stat-box--top {
+    flex-direction: row;
+}
+
+.meta-stat-box--bottom {
+    flex-direction: row;
+    gap: 2px;
+}
+
+/* Label and Value */
+.meta-stat-label,
+.meta-stat-value {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.meta-stat-label {
+    color: var(--font-color);
+    opacity: 0.7;
+    font-weight: 300;
+}
+
+.meta-stat-value {
+    /* MODIFIED: Changed color from #ffffff to inherit */
+    color: var(--font-color);
+    /* MODIFIED: Added opacity to match label */
+    opacity: 0.7;
+    font-weight: 300;
+}
+
+/*=====  End of Data Panel Layout (Grid)  ======*/
+
+/*=============================================
+=            Component: Paneton Tree          =
+=============================================*/
+/* * This is the style for the tree component itself,
+ * which lives inside the .tree-wrapper.
+*/
+.paneton-tree-container {
+    background-color: transparent !important;
+    border: none;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+
+    /* MODIFIED: Removed right padding (5px top, 0px right, 5px bottom, 10px left) */
+    padding: 5px 0 5px 10px;
+    box-sizing: border-box;
+}
+
+/* * MODIFIED: Theme override for Paneton selection
+ * Added #left-column to the selector to win the specificity war
+ * against the library's injected <style> tag.
+*/
+#left-column [data-paneton-tree] {
+    /* MODIFIED: Increased hover opacity from 1a (~10%) to 4d (~30%) */
+    --pntn-tree-color-node-background-hover: #3b3b3b4d;
+    /* This is the "selected + focused (hover)" color */
+    --pntn-tree-color-node-background-selected: var(--gradient-color-top-left-transparent);
+    /* We leave --pntn-tree-color-node-background-active as the library default (grey) */
+}
+
+/*=====  End of Component: Paneton Tree  ======*/
+
+/*=============================================
+=            Placeholders (Empty Panel)       =
+=============================================*/
+/* * This is the placeholder defined in the module's HTML.
+*/
+.placeholder {
+    color: rgba(255, 255, 255, 0.6);
+    /* MODIFIED: No padding on the container */
+    padding: 0;
+    height: 100%;
+    box-sizing: border-box;
+    /* MODIFIED: No scroll, no overflow */
+    overflow: hidden;
+}
+
+.placeholder-frame {
+    border: 1px dashed var(--dashed-border-color);
+    border-radius: 6px;
+    /* MODIFIED: Padding is *inside* the frame */
+    padding: 20px;
+    box-sizing: border-box;
+
+    width: 100%;
+    height: 100%;
+
+    /* MODIFIED: Use flex to center content */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.placeholder h2 {
+    margin-top: 0;
+    color: #fff;
+    font-weight: 500;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    /* MODIFIED: Reset to static font size */
+    font-size: 1.5em;
+}
+
+/* NEW: Style the paragraph */
+.placeholder p {
+    font-size: 1em;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/*=====  End of Placeholders (Empty Panel)  ======*/
+
+/*=============================================
+=            Component: Action Tab            =
+=============================================*/
+/*
+ * This targets the #load-sheet-button,
+ * which has class .tab but functions as an action button.
+*/
+#load-sheet-button {
+    /* Override .tab flex/sizing */
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
+    min-width: 32px;
+    max-width: 32px;
+    padding: 0;
+    margin-left: 2px;
+    /* Spacing from other tabs */
+
+    /* Override .tab grid to center icon */
+    display: grid;
+    grid-template-columns: 1fr;
+    place-items: center;
+
+    /* Make transparent by default */
+    background-color: transparent;
+    border-color: transparent;
+}
+
+/* Theme-specific border overrides for transparent state */
+#left-column #load-sheet-button {
+    border-bottom-color: transparent;
+}
+
+/* Style the injected SVG */
+#load-sheet-button svg {
+    width: 16px;
+    height: 16px;
+    stroke: var(--font-color);
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+/* Hover state for SVG */
+#load-sheet-button:hover svg {
+    opacity: 1;
+}
+
+/* Hover state to show tab appearance */
+#load-sheet-button:hover {
+    background-color: var(--tab-bg);
+    border-color: var(--border-color);
+}
+
+#left-column #load-sheet-button:hover {
+    border-bottom-color: var(--gradient-color-top-left);
+}
+
+
+/* Override .tab.active state */
+#load-sheet-button.active {
+    /* Keep transparent even when "active" (clicked) */
+    background-color: transparent;
+    color: var(--font-color);
+    margin: 0 0.5px;
+    /* Reset from .tab.active */
+    padding: 0;
+    /* Reset from .tab.active */
+
+    /* Reset active borders to look inactive */
+    border-color: transparent;
+}
+
+/* Ensure bottom border color is correct on active override */
+#left-column #load-sheet-button.active {
+    border-bottom-color: transparent;
+}
+
+/* Remove query-based padding overrides */
+@container (max-width: 100px) {
+    #load-sheet-button.active {
+        padding: 0;
+    }
+
+    /* Fix for compact action tab grid */
+    #load-sheet-button {
+        grid-template-columns: 1fr;
+        padding: 0;
+    }
+}
+
+/*=====  End of Component: Action Tab  ======*/
+
+/*=============================================
+=            Resize Optimization Strategy     =
+=============================================*/
+/* User Strategy: Outer wrapper handles scrolling */
+.tree-wrapper {
+    flex: 1;
+    overflow: auto;
+    /* Enable scrolling if content exceeds height */
+    position: relative;
+    background-color: var(--pntn-tree-color-background, #1d1d1d);
+}
+
+/* User Strategy: Inner container has fixed/max height */
+.tree-static-container {
+    height: 100vh;
+    /* Force large height so tree virtualization thinks it's huge */
+    width: 100%;
+    overflow: hidden;
+    /* Tree manages its own internal overflow/layout within this large space */
+}
+
+/* Ensure tree container fills the static container */
+.paneton-tree-container {
+    height: 100%;
+    width: 100%;
+    background-color: transparent !important;
+    border: none;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+
+    /* MODIFIED: Removed right padding (5px top, 0px right, 5px bottom, 10px left) */
+    padding: 5px 0 5px 10px;
+    box-sizing: border-box;
+}
+
+/* * MODIFIED: Theme override for Paneton selection
+ * Added #left-column to the selector to win the specificity war
+ * against the library's injected <style> tag.
+*/
+#left-column [data-paneton-tree] {
+    /* MODIFIED: Increased hover opacity from 1a (~10%) to 4d (~30%) */
+    --pntn-tree-color-node-background-hover: #3b3b3b4d;
+    /* This is the "selected + focused (hover)" color */
+    --pntn-tree-color-node-background-selected: var(--gradient-color-top-left-transparent);
+    /* We leave --pntn-tree-color-node-background-active as the library default (grey) */
+}
+
+/*=====  End of Component: Paneton Tree  ======*/
+
+/*=============================================
+=            Placeholders (Empty Panel)       =
+=============================================*/
+/* * This is the placeholder defined in the module's HTML.
+*/
+.placeholder {
+    color: rgba(255, 255, 255, 0.6);
+    /* MODIFIED: No padding on the container */
+    padding: 0;
+    height: 100%;
+    box-sizing: border-box;
+    /* MODIFIED: No scroll, no overflow */
+    overflow: hidden;
+}
+
+.placeholder-frame {
+    border: 1px dashed var(--dashed-border-color);
+    border-radius: 6px;
+    /* MODIFIED: Padding is *inside* the frame */
+    padding: 20px;
+    box-sizing: border-box;
+
+    width: 100%;
+    height: 100%;
+
+    /* MODIFIED: Use flex to center content */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.placeholder h2 {
+    margin-top: 0;
+    color: #fff;
+    font-weight: 500;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    /* MODIFIED: Reset to static font size */
+    font-size: 1.5em;
+}
+
+/* NEW: Style the paragraph */
+.placeholder p {
+    font-size: 1em;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/*=====  End of Placeholders (Empty Panel)  ======*/
+
+/*=============================================
+=            Component: Action Tab            =
+=============================================*/
+/*
+ * This targets the #load-sheet-button,
+ * which has class .tab but functions as an action button.
+*/
+#load-sheet-button {
+    /* Override .tab flex/sizing */
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
+    min-width: 32px;
+    max-width: 32px;
+    padding: 0;
+    margin-left: 2px;
+    /* Spacing from other tabs */
+
+    /* Override .tab grid to center icon */
+    display: grid;
+    grid-template-columns: 1fr;
+    place-items: center;
+
+    /* Make transparent by default */
+    background-color: transparent;
+    border-color: transparent;
+}
+
+/* Theme-specific border overrides for transparent state */
+#left-column #load-sheet-button {
+    border-bottom-color: transparent;
+}
+
+/* Style the injected SVG */
+#load-sheet-button svg {
+    width: 16px;
+    height: 16px;
+    stroke: var(--font-color);
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+/* Hover state for SVG */
+#load-sheet-button:hover svg {
+    opacity: 1;
+}
+
+/* Hover state to show tab appearance */
+#load-sheet-button:hover {
+    background-color: var(--tab-bg);
+    border-color: var(--border-color);
+}
+
+#left-column #load-sheet-button:hover {
+    border-bottom-color: var(--gradient-color-top-left);
+}
+
+
+/* Override .tab.active state */
+#load-sheet-button.active {
+    /* Keep transparent even when "active" (clicked) */
+    background-color: transparent;
+    color: var(--font-color);
+    margin: 0 0.5px;
+    /* Reset from .tab.active */
+    padding: 0;
+    /* Reset from .tab.active */
+
+    /* Reset active borders to look inactive */
+    border-color: transparent;
+}
+
+/* Ensure bottom border color is correct on active override */
+#left-column #load-sheet-button.active {
+    border-bottom-color: transparent;
+}
+
+/* Remove query-based padding overrides */
+@container (max-width: 100px) {
+    #load-sheet-button.active {
+        padding: 0;
+    }
+
+    /* Fix for compact action tab grid */
+    #load-sheet-button {
+        grid-template-columns: 1fr;
+        padding: 0;
+    }
+}
+
+/*=====  End of Component: Action Tab  ======*/
+
+/*=============================================
+=            Resize Optimization Strategy     =
+=============================================*/
+/* User Strategy: Outer wrapper handles scrolling */
+.tree-wrapper {
+    flex: 1;
+    overflow: auto;
+    /* Enable scrolling if content exceeds height */
+    position: relative;
+    background-color: var(--pntn-tree-color-background, #1d1d1d);
+}
+
+/* User Strategy: Inner container has fixed/max height */
+.tree-static-container {
+    height: 100vh;
+    /* Force large height so tree virtualization thinks it's huge */
+    width: 100%;
+    overflow: hidden;
+    /* Tree manages its own internal overflow/layout within this large space */
+}
+
+/* Ensure tree container fills the static container */
+.paneton-tree-container {
+    height: 100%;
+    width: 100%;
+}
+
+/*=====  End of Resize Optimization  ======*/
+
+/*=============================================
+=            Loading Spinner                  =
+=============================================*/
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-spinner-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    min-height: 120px;
+}
+
+.loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top-color: rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+/*=====  End of Loading Spinner  ======*/
+
+/*=============================================
+=            Drag & Drop Styles               =
+=============================================*/
+
+/* Tree label being dragged */
+.paneton-tree-label.dragging {
+    opacity: 0.5;
+    background: rgba(0, 200, 120, 0.1);
+}
+
+/* Cursor for draggable items */
+.paneton-tree-label[draggable="true"] {
+    cursor: grab;
+}
+
+.paneton-tree-label[draggable="true"]:active {
+    cursor: grabbing;
+}
+
+/*=====  End of Drag & Drop Styles  ======*/

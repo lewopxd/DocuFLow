@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <title>DocuFlow Engine</title>
+
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="modules/data-panel/data-panel.css">
+    <link rel="stylesheet" href="js/lib/excel-viewer.css">
+</head>
+
+<body>
+
+    <div class="main-container">
+
+        <div id="left-column" class="panel-column panel">
+
+            <div id="left-top-panel" class="panel-slot">
+            </div>
+
+            <div id="resizer-h-left" class="resizer resizer-horizontal"></div>
+
+            <div id="left-bottom-panel" class="panel-slot">
+            </div>
+
+        </div>
+
+        <div id="resizer-v-main" class="resizer resizer-vertical"></div>
+
+        <div id="right-column" class="panel-column panel">
+
+            <div id="right-top-panel" class="panel-slot">
+            </div>
+
+            <div id="resizer-h-right" class="resizer resizer-horizontal"></div>
+
+            <div id="right-bottom-panel" class="panel-slot">
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="js/providers/python/python-bridge.js"></script>
+    <script src="js/lib/paneton.tree.js"></script>
+    <script src="js/lib/excel-viewer.js"></script>
+    <script type="module" src="modules/data-panel/data-panel.js"></script>
+    <script type="module" src="js/main.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,10 @@
+Nivel,Clave,Tipo,Contenido Esperado
+Nivel 1 (Global),metadata,Objeto,"Información básica del archivo (ruta, nombre, tamaño, recuento de hojas)."
+Nivel 1 (Global),sheets,Array,Lista de hojas encontradas en el archivo.
+Nivel 2 (Hoja),sheetName,String,Nombre de la pestaña de la hoja de cálculo.
+Nivel 2 (Hoja),tables,Array,Lista de bloques de datos dentro de la hoja.
+Nivel 3 (Tabla),tableName,String,Nombre de la tabla (si está nombrada) o marcador (UNAMED_TABLE).
+Nivel 3 (Tabla),isNamedTable,Booleano,Indica si es una tabla definida en Excel (crucial para la UI).
+Nivel 3 (Tabla),range,String,"Rango de celdas (ej. ""A1:D86"")."
+Nivel 3 (Tabla),rowCount,Número,Número de filas detectadas.
+Nivel 3 (Tabla),columns,Array,Lista de nombres de columnas.
