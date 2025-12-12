@@ -756,3 +756,46 @@
 }
 
 /*=====  End of Lock Icon  ======*/
+
+
+/*=============================================
+=            List/Doc View Toggle             =
+=============================================*/
+
+/* List Wrapper (contains Mapping Grid + Meta Bar) */
+.list-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Doc Wrapper (Document view container) */
+.doc-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Placeholder content for doc view */
+.doc-view-placeholder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 14px;
+    text-align: center;
+    padding: 20px;
+    border: 1px dashed var(--dashed-border-color, rgba(255, 255, 255, 0.2));
+    margin: 12px;
+    border-radius: 6px;
+}
+
+.doc-view-placeholder p {
+    margin: 0;
+}
+
+/*=====  End of List/Doc View Toggle  ======*/

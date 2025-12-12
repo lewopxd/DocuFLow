@@ -19,7 +19,8 @@
 
 // Import global services and icons
 import { AppService } from '../../js/services.js';
-import { ICON_CLOSE, ICON_PLUS, ICON_FILE_TEMPLATE, ICON_RELOAD } from '../../js/icons.js';
+import { ICON_CLOSE, ICON_PLUS, ICON_FILE_TEMPLATE, ICON_RELOAD, ICON_LAYOUT_LIST, ICON_LAYOUT_DOC } from '../../js/icons.js';
+import * as DocxViewer from '../../js/lib/docx-viewer.js';
 
 //-------------------------------------------------------------
 //-------------[   MODULE STATE   ]----------------------------
@@ -383,7 +384,7 @@ function addTab(tabName, data = {}, fileIconSvg = '', fileStructure = null) {
     pathInput.readOnly = true;
     pathBar.appendChild(pathInput);
 
-    // 1.5 Controls (Reload button)
+    // 1.5 Controls (Reload button + Toggle View button)
     const controlsDiv = document.createElement('div');
     controlsDiv.className = 'status-bar__controls';
 
@@ -392,25 +393,59 @@ function addTab(tabName, data = {}, fileIconSvg = '', fileStructure = null) {
     reloadBtn.title = 'Reload Template';
     reloadBtn.innerHTML = ICON_RELOAD;
     reloadBtn.dataset.action = 'reload';
-    reloadBtn.addEventListener('click', () => loadTemplatePlaceholders(data.filePath, mappingGrid, metaBar));
+
+    // Toggle View Button (List/Doc)
+    const toggleBtn = document.createElement('button');
+    toggleBtn.className = 'icon-button';
+    toggleBtn.title = 'Switch to Document View';
+    toggleBtn.innerHTML = ICON_LAYOUT_DOC;
+    toggleBtn.dataset.action = 'toggle-view';
 
     controlsDiv.appendChild(reloadBtn);
+    controlsDiv.appendChild(toggleBtn);
     pathBar.appendChild(controlsDiv);
 
     gridWrapper.appendChild(pathBar);
 
-    // 2. Mapping Grid Container
+    // 2. List Wrapper (contains Mapping Grid + Meta Bar) - visible by default
+    const listWrapper = document.createElement('div');
+    listWrapper.className = 'list-wrapper';
+    const listWrapperId = `list-wrapper-${Date.now()}`;
+    listWrapper.id = listWrapperId;
+
+    // 2.1 Mapping Grid Container
     const mappingGrid = document.createElement('div');
     mappingGrid.className = 'mapping-grid';
     mappingGrid.dataset.filePath = data.filePath; // Store for refresh lookup
     mappingGrid.innerHTML = '<div class="loading-spinner-container"><div class="loading-spinner"></div></div>';
-    gridWrapper.appendChild(mappingGrid);
+    listWrapper.appendChild(mappingGrid);
 
-    // 3. Meta Footer Bar (similar to data-panel)
+    // 2.2 Meta Footer Bar
     const metaBar = document.createElement('div');
     metaBar.className = 'template-meta-bar';
     metaBar.innerHTML = '<span class="meta-item">Cargando información...</span>';
-    gridWrapper.appendChild(metaBar);
+    listWrapper.appendChild(metaBar);
+
+    gridWrapper.appendChild(listWrapper);
+
+    // 3. Doc Wrapper (empty placeholder for future doc view) - hidden by default
+    const docWrapper = document.createElement('div');
+    docWrapper.className = 'doc-wrapper';
+    docWrapper.style.display = 'none';
+    const docWrapperId = `doc-wrapper-${Date.now()}`;
+    docWrapper.id = docWrapperId;
+    // Content will be populated by DocxViewer when switching to doc view
+
+    gridWrapper.appendChild(docWrapper);
+
+    // Store wrapper IDs and file path on content pane for toggle functionality
+    newContentPane.dataset.listWrapperId = listWrapperId;
+    newContentPane.dataset.docWrapperId = docWrapperId;
+    newContentPane.dataset.filePath = data.filePath;
+
+    // Setup control handlers
+    reloadBtn.addEventListener('click', () => loadTemplatePlaceholders(data.filePath, mappingGrid, metaBar));
+    toggleBtn.addEventListener('click', () => toggleTemplateView(newContentPane, toggleBtn));
 
     // 4. Load placeholders from backend
     loadTemplatePlaceholders(data.filePath, mappingGrid, metaBar);
@@ -418,7 +453,99 @@ function addTab(tabName, data = {}, fileIconSvg = '', fileStructure = null) {
     return contentId;
 }
 
-//--------------------------------------> END [ DYNAMIC DOM BUILDERS ... ]
+//---------------------------------------> END [ DYNAMIC DOM BUILDERS ... ]
+
+
+//-------------------------------------------------------------
+//-------------[   VIEW TOGGLE SYSTEM   ]----------------------
+//-------------------------------------------------------------
+
+/**
+ * [Toggles between List view and Doc view for the templates panel.]
+ * @param {HTMLElement} contentPane - The content pane element.
+ * @param {HTMLElement} btn - The toggle button element.
+ */
+async function toggleTemplateView(contentPane, btn) {
+    const listWrapperId = contentPane.dataset.listWrapperId;
+    const docWrapperId = contentPane.dataset.docWrapperId;
+    const filePath = contentPane.dataset.filePath;
+
+    const listWrapper = document.getElementById(listWrapperId);
+    const docWrapper = document.getElementById(docWrapperId);
+
+    if (!listWrapper || !docWrapper) {
+        console.warn('[TemplatesPanel] Toggle view: Missing elements');
+        return;
+    }
+
+    const isListVisible = listWrapper.style.display !== 'none';
+
+    if (isListVisible) {
+        // Switch to Doc View
+        listWrapper.style.display = 'none';
+        docWrapper.style.display = 'flex';
+        btn.innerHTML = ICON_LAYOUT_LIST;
+        btn.title = 'Switch to List View';
+
+        // Load document if not already loaded
+        await loadDocumentIntoViewer(docWrapper, filePath);
+    } else {
+        // Switch to List View
+        listWrapper.style.display = 'flex';
+        docWrapper.style.display = 'none';
+        btn.innerHTML = ICON_LAYOUT_DOC;
+        btn.title = 'Switch to Document View';
+    }
+
+    // Mark project as dirty for auto-save
+    if (window.ProjectManager && window.ProjectManager.markDirty) {
+        window.ProjectManager.markDirty();
+    }
+}
+
+/**
+ * [Loads a docx document into the viewer container.]
+ * @param {HTMLElement} docWrapper - The doc wrapper container.
+ * @param {string} filePath - Path to the docx file.
+ */
+async function loadDocumentIntoViewer(docWrapper, filePath) {
+    if (!filePath) {
+        console.warn('[TemplatesPanel] No file path for doc viewer');
+        return;
+    }
+
+    // Check if already loaded for this path
+    const viewer = DocxViewer.createViewer(docWrapper);
+    if (viewer.currentFilePath === filePath && viewer.isRendered) {
+        console.log('[TemplatesPanel] Document already loaded');
+        return;
+    }
+
+    try {
+        // Show loading state
+        viewer.showLoading();
+
+        // Fetch document data from backend
+        const response = await AppService.getDocxFileData(filePath);
+
+        if (!response || !response.success) {
+            const errorMsg = response?.error || 'Failed to load document';
+            viewer.showError(errorMsg);
+            console.error('[TemplatesPanel] Doc load error:', errorMsg);
+            return;
+        }
+
+        // Render the document
+        await viewer.render(response.data, filePath);
+        console.log(`[TemplatesPanel] Document rendered: ${response.fileName} (${response.fileSizeKB}KB)`);
+
+    } catch (error) {
+        console.error('[TemplatesPanel] Error loading document:', error);
+        viewer.showError(`Error: ${error.message}`);
+    }
+}
+
+//---------------------------------------> END [ VIEW TOGGLE SYSTEM ... ]
 
 
 //-------------------------------------------------------------
@@ -957,12 +1084,23 @@ function exportPanelState() {
         // Get mappings for this template
         const mappings = window.DocuFlowLockedMappings[filePath] || {};
 
+        // Detect actual view mode from content pane
+        let viewMode = 'list';
+        const contentPane = contentContainer?.querySelector(`#${tabId}`);
+        if (contentPane) {
+            const listWrapper = contentPane.querySelector('.list-wrapper');
+            if (listWrapper && listWrapper.style.display === 'none') {
+                viewMode = 'doc';
+            }
+        }
+
         tabs.push({
             id: tabId,
             filePath: filePath,
             fileName: fileName,
             mappings: mappings,
-            lockedMappings: Object.keys(mappings)
+            lockedMappings: Object.keys(mappings),
+            viewMode: viewMode
         });
     });
 
@@ -1004,6 +1142,28 @@ async function importPanelState(state) {
                     ICON_FILE_TEMPLATE,
                     null
                 );
+
+                // Restore viewMode if saved as 'doc'
+                if (tabData.viewMode === 'doc') {
+                    const tab = document.querySelector(`[data-file-path="${CSS.escape(tabData.filePath)}"]`);
+                    if (tab) {
+                        const contentPaneSelector = tab.dataset.tabTarget;
+                        const contentPane = contentPaneSelector ? contentContainer.querySelector(contentPaneSelector) : null;
+                        if (contentPane) {
+                            const listWrapper = document.getElementById(contentPane.dataset.listWrapperId);
+                            const docWrapper = document.getElementById(contentPane.dataset.docWrapperId);
+                            const toggleBtn = contentPane.querySelector('[data-action="toggle-view"]');
+                            if (listWrapper && docWrapper) {
+                                listWrapper.style.display = 'none';
+                                docWrapper.style.display = 'flex';
+                                if (toggleBtn) {
+                                    toggleBtn.innerHTML = ICON_LAYOUT_LIST;
+                                    toggleBtn.title = 'Switch to List View';
+                                }
+                            }
+                        }
+                    }
+                }
             } catch (e) {
                 console.error(`[TemplatesPanel] Error restoring tab: ${tabData.filePath}`, e);
             }

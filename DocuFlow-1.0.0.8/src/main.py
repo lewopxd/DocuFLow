@@ -509,6 +509,8 @@ def start_webview_app(handshake_event: multiprocessing.Event, config: dict):
             self.register_handler("get_excel_full_data", self._handle_get_excel_full_data)  # Split API
             # Template parsing handler
             self.register_handler("get_template_placeholders", self._handle_get_template_placeholders)
+            # Document viewer handler (sends docx as base64)
+            self.register_handler("get_docx_file_data", self._handle_get_docx_file_data)
             # Job control handlers
             self.register_handler("job_cancel", self._handle_job_cancel)
             self.register_handler("job_pause", self._handle_job_pause)
@@ -724,6 +726,50 @@ def start_webview_app(handshake_event: multiprocessing.Event, config: dict):
             except Exception as e:
                 Logger.error(f"Error en _handle_get_template_placeholders: {e}")
                 return {"success": False, "error": str(e), "placeholders": []}
+
+        def _handle_get_docx_file_data(self, content: dict) -> Optional[Dict[str, Any]]:
+            """
+            Handler para enviar un archivo docx como base64 para el viewer.
+            Usado por la UI para mostrar la vista previa del documento.
+            """
+            try:
+                import base64
+                from pathlib import Path
+                
+                file_path = content.get("filePath")
+                if not file_path:
+                    return {"success": False, "error": "No se proporcionó 'filePath'"}
+                
+                path = Path(file_path)
+                if not path.exists():
+                    return {"success": False, "error": f"Archivo no encontrado: {file_path}"}
+                
+                if not path.suffix.lower() in ['.docx', '.doc']:
+                    return {"success": False, "error": f"Tipo de archivo no soportado: {path.suffix}"}
+                
+                Logger.info(f"Bridge: Loading docx for viewer: {file_path}")
+                
+                # Read file as binary and encode to base64
+                with open(file_path, 'rb') as f:
+                    file_bytes = f.read()
+                
+                base64_data = base64.b64encode(file_bytes).decode('utf-8')
+                file_size_kb = len(file_bytes) / 1024
+                
+                Logger.info(f"Bridge: Encoded {file_size_kb:.1f}KB docx to base64")
+                
+                return {
+                    "success": True,
+                    "data": base64_data,
+                    "filePath": file_path,
+                    "fileName": path.name,
+                    "fileSize": len(file_bytes),
+                    "fileSizeKB": round(file_size_kb, 1)
+                }
+                
+            except Exception as e:
+                Logger.error(f"Error en _handle_get_docx_file_data: {e}")
+                return {"success": False, "error": str(e)}
 
         # --- Job Control Handlers ---
         

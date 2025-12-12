@@ -150,6 +150,15 @@ export const AppService = {
         return activeProvider.getTemplatePlaceholders(filePath);
     },
 
+    /**
+     * [Get docx file data as base64 for document viewer]
+     * @param {string} filePath - The full path of the .docx file.
+     * @returns {Promise<object|null>} Base64 encoded file data for viewing.
+     */
+    getDocxFileData: (filePath) => {
+        return activeProvider.getDocxFileData(filePath);
+    },
+
     // --- PROJECT MANAGEMENT ---
 
     /**

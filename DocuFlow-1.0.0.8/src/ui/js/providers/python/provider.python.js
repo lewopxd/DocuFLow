@@ -154,6 +154,20 @@ export function getTemplatePlaceholders(filePath, definitions = null) {
 }
 // --- [ END TEMPLATE PLACEHOLDERS API ] ---
 
+// --- [ DOCUMENT VIEWER API ] ---
+
+/**
+ * [Requests the Python backend to send a docx file as base64 for viewing.]
+ * @param {string} filePath - The full path of the .docx file.
+ * @returns {Promise<object|null>} Base64 encoded file data for viewing.
+ */
+export function getDocxFileData(filePath) {
+    return window.bridgePy.send('get_docx_file_data', {
+        filePath: filePath
+    });
+}
+// --- [ END DOCUMENT VIEWER API ] ---
+
 // --- [ PROJECT MANAGEMENT API ] ---
 
 /**

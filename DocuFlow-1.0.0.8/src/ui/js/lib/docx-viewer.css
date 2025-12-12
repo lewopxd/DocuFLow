@@ -1,0 +1,150 @@
+/* js/lib/docx-viewer.css */
+/**
+ * Project: DocuFlow
+ * File:  lib/docx-viewer.css
+ * Created: 2025-12-12
+ * Author: @lewopxd
+ *
+ * Description:
+ * Styles for the docx-preview document viewer.
+ * Provides CSS isolation and dark theme support.
+ */
+
+/*=============================================
+=            VIEWER WRAPPER             =
+=============================================*/
+
+.docx-viewer-wrapper {
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background: #ffffff;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* Dark theme wrapper */
+.doc-wrapper.dark-theme .docx-viewer-wrapper {
+    background: #2d2d2d;
+}
+
+/*=====  End of VIEWER WRAPPER  ======*/
+
+
+/*=============================================
+=            LOADING STATE            =
+=============================================*/
+
+.docx-viewer-loading {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 14px;
+}
+
+.docx-viewer-loading .loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    border-top-color: #4a90d9;
+    border-radius: 50%;
+    animation: docx-spin 0.8s linear infinite;
+    margin-bottom: 12px;
+}
+
+@keyframes docx-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.docx-viewer-loading p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/*=====  End of LOADING STATE  ======*/
+
+
+/*=============================================
+=            ERROR STATE            =
+=============================================*/
+
+.docx-viewer-error {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    color: #ff6b6b;
+    font-size: 14px;
+    text-align: center;
+    padding: 20px;
+}
+
+.docx-viewer-error p {
+    margin: 0;
+}
+
+/*=====  End of ERROR STATE  ======*/
+
+
+/*=============================================
+=            DOCX-PREVIEW OVERRIDES            =
+=============================================*/
+
+/* Document body/page styling */
+.docx-viewer-wrapper .dv-wrapper {
+    padding: 20px;
+    margin: 0 auto;
+    background: #ffffff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.doc-wrapper.dark-theme .docx-viewer-wrapper .dv-wrapper {
+    background: #1e1e1e;
+    color: #e0e0e0;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Section wrapper */
+.docx-viewer-wrapper section.dv-wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Tables */
+.docx-viewer-wrapper table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.docx-viewer-wrapper table td,
+.docx-viewer-wrapper table th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.doc-wrapper.dark-theme .docx-viewer-wrapper table td,
+.doc-wrapper.dark-theme .docx-viewer-wrapper table th {
+    border-color: #444;
+}
+
+/* Images */
+.docx-viewer-wrapper img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Paragraphs */
+.docx-viewer-wrapper p {
+    margin: 0;
+    padding: 0;
+    line-height: 1.5;
+}
+
+/*=====  End of DOCX-PREVIEW OVERRIDES  ======*/
